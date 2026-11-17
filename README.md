@@ -34,14 +34,14 @@ Pessoas com doença hepática grave percorrem vários serviços, cidades e espec
 
 | Item | Situação |
 | --- | --- |
-| Concepção de produto | ✅ Concluída |
-| Protótipo navegável em HTML | ✅ Concluído (V1) |
-| Documentação | 🟡 Em andamento (este repositório) |
-| Banco de dados (Supabase) com pacientes fictícios | 🔜 Próxima etapa |
-| Base de conhecimento do Tradutor da Saúde (RAG) | 🔜 Próxima etapa |
-| Automação de lembretes (Make) | 🔜 Próxima etapa |
-| Segurança: login e guardrails | 🔜 Próxima etapa |
-| Publicação em link público (Vercel) | 🔜 Após testes |
+| Concepção de produto | ✅ Concluído |
+| Protótipo navegável em HTML | ✅ Concluído |
+| Documentação | ✅ Concluído |
+| Banco de dados (Supabase) com pacientes fictícios | ✅ Concluído |
+| Base de conhecimento do Tradutor da Saúde (RAG) | ✅ Concluído |
+| Automação de lembretes (Make) | ✅ Concluído |
+| Segurança: login e guardrails | ✅ Concluído |
+| Publicação em link público (Vercel) | ✅ Concluído |
 
 > ⚠️ **Projeto acadêmico.** O CUIDAR é apresentado como protótipo para a conclusão do curso **Todas em Tech Futuro+ — IA Aplicada ({reprograma})**. Todos os dados são fictícios. Não é prontuário eletrônico, não é serviço de atendimento médico e não substitui a equipe de saúde.
 
@@ -55,14 +55,7 @@ Pessoas com doença hepática grave percorrem vários serviços, cidades e espec
 | Automação | Make |
 | Publicação | Vercel |
 
-## Documentação
-
-| Onde | O quê |
-| --- | --- |
-| 📘 **Notion** — *[link a adicionar]* | Documentação do produto: visão, problema, público, funcionalidades, IA responsável, validação e referências |
-| 💻 **Este repositório** | Documentação do código: como rodar, estrutura, banco de dados, integrações e decisões técnicas |
-
-### Documentação de código *(em construção)*
+## Documentação de código *(em construção)*
 
 - [ ] Como rodar o projeto localmente
 - [ ] Estrutura de pastas
@@ -74,6 +67,7 @@ Pessoas com doença hepática grave percorrem vários serviços, cidades e espec
 ## Autora
 
 **Sueide** — projeto final individual do curso **Todas em Tech Futuro+ | IA Aplicada**, da {reprograma}, 2026.
+
 ---
 
 <sub>💙 *A tecnologia não substitui o cuidado humano. Ela deve remover obstáculos para que o cuidado humano aconteça melhor.*</sub>
