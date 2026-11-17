@@ -1,0 +1,27 @@
+# --- Segredos: NUNCA vão para o GitHub ---
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+supabase/.temp/
+supabase/.branches/
+supabase/functions/.env
+.vercel/
+
+# --- Dependências e builds ---
+node_modules/
+
+# --- Sistema e editor ---
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# --- Logs ---
+*.log
+npm-debug.log*
+
+# --- Dados de teste exportados (podem conter dados pessoais) ---
+*.csv.bak
+exports/

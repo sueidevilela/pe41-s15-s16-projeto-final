@@ -1,0 +1,360 @@
+{
+  "_sobre": "Conteúdo oficial da Central de Ajuda do CUIDAR. Fonte de verdade para o Claude Code: usar os textos exatamente como estão. Campos opcionais por pergunta: passos, itens, dica, alerta, print, irPara.",
+  "versao": "1.0",
+  "boasVindas": "Olá! Aqui você encontra respostas para as dúvidas mais comuns sobre o CUIDAR. Toque na pergunta para ver a resposta.",
+  "mensagens": {
+    "buscaRotulo": "Digite sua dúvida",
+    "buscaExemplo": "Exemplo: como adicionar exame",
+    "buscaSemResultado": "Não encontramos uma resposta para essa busca. Tente usar outras palavras ou fale com a sua equipe de cuidado.",
+    "perguntaAjudou": "Esta resposta ajudou?",
+    "obrigadoFeedback": "Obrigado! Sua opinião ajuda a melhorar o CUIDAR.",
+    "imagemEmPreparacao": "Imagem em preparação",
+    "voltarPerguntas": "← Voltar para as perguntas",
+    "irParaTela": "Ir para esta tela",
+    "ouvirResposta": "🔊 Ouvir resposta",
+    "pararLeitura": "⏹ Parar leitura"
+  },
+  "categorias": [
+    { "id": "primeiros-passos", "nome": "Primeiros passos", "icone": "🧭" },
+    { "id": "documentos", "nome": "Documentos e exames", "icone": "📄" },
+    { "id": "consultas", "nome": "Consultas", "icone": "🩺" },
+    { "id": "tradutor", "nome": "Tradutor da Saúde", "icone": "✧" },
+    { "id": "equipe", "nome": "Equipe de cuidado", "icone": "👩‍⚕️" },
+    { "id": "paliativo", "nome": "Cuidado paliativo", "icone": "♡" },
+    { "id": "seguranca", "nome": "Segurança e privacidade", "icone": "🔒" },
+    { "id": "familia", "nome": "Familiares e cuidadores", "icone": "🤝" },
+    { "id": "problemas", "nome": "Problemas comuns", "icone": "🛠️" }
+  ],
+  "perguntas": [
+    {
+      "id": "o-que-e-cuidar",
+      "categoria": "primeiros-passos",
+      "pergunta": "O que é o CUIDAR?",
+      "resumo": "O CUIDAR reúne em um só lugar suas informações de saúde: documentos, exames, consultas e a equipe que cuida de você. Assim fica mais fácil levar seu histórico para qualquer atendimento.",
+      "print": { "arquivo": "img/ajuda/ajuda-01-visao-geral.png", "descricao": "Tela Visão geral, com destaque na mensagem de boas-vindas." },
+      "irPara": "inicio",
+      "palavrasChave": ["aplicativo", "app", "para que serve", "sistema", "inicio"]
+    },
+    {
+      "id": "mudar-de-tela",
+      "categoria": "primeiros-passos",
+      "pergunta": "Como eu mudo de tela?",
+      "resumo": "Você usa o menu do lado esquerdo para ir de uma parte para outra.",
+      "passos": [
+        "Olhe o menu do lado esquerdo da tela.",
+        "Toque no nome da parte que você quer ver, por exemplo Documentos e exames.",
+        "A tela muda e o nome aparece no alto da página."
+      ],
+      "print": { "arquivo": "img/ajuda/ajuda-02-menu.png", "descricao": "Menu esquerdo com seta apontando para Documentos e exames." },
+      "palavrasChave": ["menu", "navegar", "trocar", "pagina", "mudar"]
+    },
+    {
+      "id": "menu-celular",
+      "categoria": "primeiros-passos",
+      "pergunta": "Estou no celular e não vejo o menu. O que faço?",
+      "resumo": "No celular, o menu fica escondido para sobrar espaço na tela.",
+      "passos": [
+        "No canto de cima, à esquerda, toque no botão com três risquinhos ☰.",
+        "O menu vai aparecer. Toque na opção desejada.",
+        "O menu fecha sozinho depois que você escolhe."
+      ],
+      "print": { "arquivo": "img/ajuda/ajuda-03-menu-celular.png", "descricao": "Versão celular, com círculo no botão ☰." },
+      "palavrasChave": ["celular", "telefone", "menu sumiu", "tres riscos", "hamburguer"]
+    },
+    {
+      "id": "voltar-inicio",
+      "categoria": "primeiros-passos",
+      "pergunta": "Como volto para a tela inicial?",
+      "resumo": "No menu, toque em ⌂ Visão geral. Ela é sempre a primeira opção.",
+      "irPara": "inicio",
+      "palavrasChave": ["voltar", "inicio", "comeco", "tela principal", "visao geral"]
+    },
+    {
+      "id": "dados-sao-meus",
+      "categoria": "primeiros-passos",
+      "pergunta": "As informações que aparecem são minhas?",
+      "resumo": "Nesta versão de demonstração, os dados são fictícios, ou seja, de exemplo. Na versão real, aparecerão as suas informações.",
+      "palavrasChave": ["dados", "exemplo", "maria silva", "demonstracao", "ficticio"]
+    },
+    {
+      "id": "minha-jornada",
+      "categoria": "primeiros-passos",
+      "pergunta": "O que é a tela Minha jornada?",
+      "resumo": "Ela mostra as etapas que o cuidado pode ter, como diagnóstico, tratamento e acompanhamento. Cada pessoa tem um caminho diferente, que é definido junto com a equipe de saúde.",
+      "irPara": "jornada",
+      "palavrasChave": ["jornada", "etapas", "tratamento", "transplante", "caminho"]
+    },
+    {
+      "id": "adicionar-documento",
+      "categoria": "documentos",
+      "pergunta": "Como adiciono um exame ou documento?",
+      "resumo": "Você pode guardar exames, laudos, receitas e imagens no CUIDAR.",
+      "passos": [
+        "No menu, toque em Documentos e exames, ou no botão azul ＋ Adicionar documento, no alto da tela.",
+        "Toque em Escolher arquivo e selecione o documento no seu celular ou computador.",
+        "Escreva onde o documento foi feito, por exemplo Hospital das Clínicas.",
+        "Escolha o tipo de documento na lista.",
+        "Toque no botão azul ＋ Registrar documento."
+      ],
+      "print": { "arquivo": "img/ajuda/ajuda-04-formulario-documento.png", "descricao": "Formulário de documento com os campos numerados de 1 a 4 e o botão Registrar documento." },
+      "irPara": "documentos",
+      "palavrasChave": ["exame", "documento", "enviar", "anexar", "laudo", "upload", "guardar", "adicionar"]
+    },
+    {
+      "id": "exame-papel",
+      "categoria": "documentos",
+      "pergunta": "Tenho o exame só no papel. Posso colocar no CUIDAR?",
+      "resumo": "Pode. Tire uma foto do papel com o celular e depois adicione essa foto como documento.",
+      "passos": [
+        "Coloque o papel em uma mesa, em um lugar com boa luz.",
+        "Tire a foto com o celular bem reto, por cima do papel.",
+        "Confira se dá para ler tudo na foto.",
+        "Siga os passos de Como adiciono um exame e escolha essa foto."
+      ],
+      "dica": "Na primeira vez, peça ajuda a um familiar.",
+      "irPara": "documentos",
+      "palavrasChave": ["papel", "foto", "fotografar", "impresso", "camera"]
+    },
+    {
+      "id": "tipo-documento",
+      "categoria": "documentos",
+      "pergunta": "Que tipo de documento eu escolho?",
+      "resumo": "Escolha o tipo que mais combina com o seu documento:",
+      "itens": [
+        "Exame laboratorial: resultado de exame de sangue, urina etc.",
+        "Laudo ou relatório: texto escrito pelo médico.",
+        "Imagem de exame: ultrassom, tomografia, raio-X.",
+        "Receita ou orientação: receitas e recomendações.",
+        "Outro: quando não souber. Tudo bem escolher esta opção."
+      ],
+      "palavrasChave": ["tipo", "categoria", "laudo", "receita", "imagem", "qual escolher"]
+    },
+    {
+      "id": "ver-documentos",
+      "categoria": "documentos",
+      "pergunta": "Onde vejo os documentos que já guardei?",
+      "resumo": "Em Documentos e exames, desça a tela até Arquivos registrados e toque em Abrir. Os mais recentes também aparecem na tela inicial, em Documentos recentes.",
+      "print": { "arquivo": "img/ajuda/ajuda-05-arquivos-registrados.png", "descricao": "Lista Arquivos registrados com destaque no botão Abrir." },
+      "irPara": "documentos",
+      "palavrasChave": ["ver", "abrir", "encontrar", "meus documentos", "arquivos", "exames antigos"]
+    },
+    {
+      "id": "proxima-consulta",
+      "categoria": "consultas",
+      "pergunta": "Onde vejo minha próxima consulta?",
+      "resumo": "Na tela inicial, Visão geral, no cartão azul Próximo compromisso. Ali aparecem a especialidade, o dia, o horário e o local.",
+      "print": { "arquivo": "img/ajuda/ajuda-06-proximo-compromisso.png", "descricao": "Cartão azul Próximo compromisso destacado com um círculo." },
+      "irPara": "inicio",
+      "palavrasChave": ["consulta", "compromisso", "horario", "data", "agenda", "medico"]
+    },
+    {
+      "id": "historico",
+      "categoria": "consultas",
+      "pergunta": "Como vejo tudo o que já aconteceu no meu tratamento?",
+      "resumo": "Toque em Histórico de saúde no menu, ou em Ver histórico completo na tela inicial. As informações aparecem em ordem de data.",
+      "print": { "arquivo": "img/ajuda/ajuda-07-historico.png", "descricao": "Tela Histórico de saúde com a linha do tempo." },
+      "irPara": "historico",
+      "palavrasChave": ["historico", "linha do tempo", "passado", "tratamento", "antes"]
+    },
+    {
+      "id": "anotar-consulta",
+      "categoria": "consultas",
+      "pergunta": "Como anoto o que o médico falou na consulta?",
+      "resumo": "A tela Depois da consulta ajuda você a não depender só da memória.",
+      "passos": [
+        "No menu, toque em Depois da consulta.",
+        "No primeiro espaço, escreva com suas palavras o que você lembra da conversa.",
+        "No segundo espaço, escreva as orientações: exames pedidos, cuidados, remédios.",
+        "Toque em Organizar minhas anotações."
+      ],
+      "dica": "Faça isso logo depois da consulta, ainda na sala de espera, ou peça para o acompanhante escrever.",
+      "print": { "arquivo": "img/ajuda/ajuda-08-depois-consulta.png", "descricao": "Tela Depois da consulta com os dois campos numerados e o botão." },
+      "irPara": "consulta",
+      "palavrasChave": ["anotar", "anotacao", "medico falou", "orientacao", "esqueci", "consulta"]
+    },
+    {
+      "id": "o-que-e-tradutor",
+      "categoria": "tradutor",
+      "pergunta": "O que é o Tradutor da Saúde?",
+      "resumo": "É uma ajuda para entender palavras difíceis de exames e relatórios. Você copia o trecho e ele explica em palavras simples.",
+      "irPara": "tradutor",
+      "palavrasChave": ["tradutor", "palavra dificil", "entender", "explicar", "inteligencia artificial", "ia"]
+    },
+    {
+      "id": "usar-tradutor",
+      "categoria": "tradutor",
+      "pergunta": "Como uso o Tradutor da Saúde?",
+      "resumo": "Em poucos passos você recebe uma explicação mais simples.",
+      "passos": [
+        "No menu, toque em Tradutor da Saúde.",
+        "Escreva ou cole a palavra ou o trecho que você não entendeu.",
+        "Toque em ✧ Explicar em linguagem simples.",
+        "Leia a explicação que aparece logo abaixo."
+      ],
+      "print": { "arquivo": "img/ajuda/ajuda-09-tradutor.png", "descricao": "Campo do Tradutor com um exemplo escrito e seta no botão Explicar em linguagem simples." },
+      "irPara": "tradutor",
+      "palavrasChave": ["tradutor", "como usar", "colar", "explicar", "termo"]
+    },
+    {
+      "id": "confiar-tradutor",
+      "categoria": "tradutor",
+      "pergunta": "Posso confiar no que o Tradutor diz?",
+      "resumo": "Ele ajuda a entender, mas não substitui o seu médico. Use a explicação para preparar suas perguntas e sempre confirme com a equipe que cuida de você.",
+      "palavrasChave": ["confiar", "certo", "medico", "substitui", "seguro"]
+    },
+    {
+      "id": "dados-tradutor",
+      "categoria": "tradutor",
+      "pergunta": "Posso colocar meu nome ou CPF no Tradutor?",
+      "resumo": "Não é preciso. Cole só o trecho do exame, sem nome, CPF ou número de documento.",
+      "palavrasChave": ["cpf", "nome", "dados pessoais", "privacidade", "documento"]
+    },
+    {
+      "id": "quem-e-equipe",
+      "categoria": "equipe",
+      "pergunta": "Quem faz parte da minha equipe?",
+      "resumo": "Em Equipe de cuidado você vê as especialidades que podem acompanhar você, como hepatologia, nutrição, psicologia e cuidados paliativos. Quem participa depende de cada caso.",
+      "print": { "arquivo": "img/ajuda/ajuda-10-equipe-especialidades.png", "descricao": "Grade de especialidades da Equipe de cuidado." },
+      "irPara": "equipe",
+      "palavrasChave": ["equipe", "medicos", "especialidade", "profissionais", "nutricionista", "psicologo"]
+    },
+    {
+      "id": "pedir-contato",
+      "categoria": "equipe",
+      "pergunta": "Como peço para a equipe entrar em contato comigo?",
+      "resumo": "Você pode deixar um pedido de contato para o serviço responsável.",
+      "passos": [
+        "No menu, toque em Equipe de cuidado.",
+        "Desça a tela até Solicitar contato da equipe.",
+        "Em Assunto, escolha o motivo na lista.",
+        "Em Mensagem, escreva sua dúvida em poucas palavras.",
+        "Toque em Solicitar contato."
+      ],
+      "print": { "arquivo": "img/ajuda/ajuda-11-formulario-contato.png", "descricao": "Formulário Solicitar contato da equipe com os campos numerados." },
+      "irPara": "equipe",
+      "palavrasChave": ["contato", "falar", "mensagem", "duvida", "ligar", "equipe"]
+    },
+    {
+      "id": "tempo-resposta",
+      "categoria": "equipe",
+      "pergunta": "Em quanto tempo a equipe responde?",
+      "resumo": "A resposta segue os horários de atendimento do serviço.",
+      "alerta": { "tipo": "aviso", "texto": "Este canal não é para urgência." },
+      "palavrasChave": ["tempo", "demora", "resposta", "quando", "prazo"]
+    },
+    {
+      "id": "emergencia",
+      "categoria": "equipe",
+      "pergunta": "E se for uma emergência?",
+      "resumo": "Não use o CUIDAR em uma emergência.",
+      "alerta": { "tipo": "emergencia", "texto": "Ligue para o SAMU 192 ou vá ao pronto-atendimento mais próximo." },
+      "palavrasChave": ["emergencia", "urgencia", "samu", "192", "socorro", "passando mal"]
+    },
+    {
+      "id": "o-que-e-paliativo",
+      "categoria": "paliativo",
+      "pergunta": "O que é cuidado paliativo?",
+      "resumo": "É o cuidado que alivia dores, desconfortos e sofrimentos, para você ter mais qualidade de vida. Ele olha para a pessoa por inteiro: corpo, emoções, família e espiritualidade.",
+      "irPara": "paliativos",
+      "palavrasChave": ["paliativo", "qualidade de vida", "dor", "sofrimento", "conforto"]
+    },
+    {
+      "id": "paliativo-desistir",
+      "categoria": "paliativo",
+      "pergunta": "Cuidado paliativo quer dizer que desistiram do meu tratamento?",
+      "resumo": "Não. Ele pode acontecer junto com os outros tratamentos, em qualquer fase da doença. Não é só para o fim da vida.",
+      "palavrasChave": ["desistir", "fim da vida", "paliativo", "tratamento", "medo"]
+    },
+    {
+      "id": "conversar-paliativo",
+      "categoria": "paliativo",
+      "pergunta": "Como peço para conversar sobre isso com a equipe?",
+      "resumo": "A tela Cuidado paliativo ajuda você a preparar essa conversa.",
+      "passos": [
+        "No menu, toque em Cuidado paliativo.",
+        "Escolha na lista o assunto que você quer conversar.",
+        "Toque em Preparar conversa com a equipe."
+      ],
+      "print": { "arquivo": "img/ajuda/ajuda-12-paliativo-conversa.png", "descricao": "Lista de assuntos e botão Preparar conversa com a equipe." },
+      "irPara": "paliativos",
+      "palavrasChave": ["conversar", "paliativo", "equipe", "assunto", "preparar"]
+    },
+    {
+      "id": "quem-ve-dados",
+      "categoria": "seguranca",
+      "pergunta": "Quem pode ver minhas informações?",
+      "resumo": "Este é um protótipo de demonstração e não guarda informações de pessoas reais. Em uma versão real, só você e as pessoas que você autorizar poderiam ver seus dados, seguindo a Lei Geral de Proteção de Dados (LGPD).",
+      "palavrasChave": ["privacidade", "quem ve", "dados", "lgpd", "segredo", "seguranca"]
+    },
+    {
+      "id": "documentos-seguros",
+      "categoria": "seguranca",
+      "pergunta": "Meus documentos ficam guardados com segurança?",
+      "resumo": "Nesta demonstração, nenhum arquivo é enviado ou guardado. Em uma versão real, eles ficariam em um armazenamento protegido.",
+      "palavrasChave": ["seguro", "guardado", "armazenamento", "arquivo", "perder"]
+    },
+    {
+      "id": "familiar-ajudar",
+      "categoria": "familia",
+      "pergunta": "Um familiar pode me ajudar a usar o CUIDAR?",
+      "resumo": "Pode, e é recomendado. A pessoa pode sentar ao seu lado e seguir estas respostas com você.",
+      "palavrasChave": ["familiar", "filho", "filha", "neto", "ajuda", "acompanhante"]
+    },
+    {
+      "id": "apoio-cuidador",
+      "categoria": "familia",
+      "pergunta": "Sou cuidador. Onde encontro apoio para mim?",
+      "resumo": "Quem cuida também precisa de cuidado.",
+      "passos": [
+        "No menu, toque em Cuidado paliativo.",
+        "Na lista, escolha Preciso de apoio como familiar ou cuidador.",
+        "Toque em Preparar conversa com a equipe."
+      ],
+      "irPara": "paliativos",
+      "palavrasChave": ["cuidador", "cuidadora", "familia", "apoio", "cansado"]
+    },
+    {
+      "id": "letra-pequena",
+      "categoria": "problemas",
+      "pergunta": "A letra está muito pequena. Como aumento?",
+      "resumo": "Você tem algumas formas de aumentar a letra:",
+      "itens": [
+        "Aqui na Central de Ajuda, toque em A+.",
+        "No celular, afaste dois dedos na tela para aumentar.",
+        "No computador, aperte as teclas Ctrl e + ao mesmo tempo."
+      ],
+      "print": { "arquivo": "img/ajuda/ajuda-13-botao-letra.png", "descricao": "Botão A+ da Central de Ajuda destacado." },
+      "palavrasChave": ["letra pequena", "aumentar", "zoom", "enxergar", "ler", "tamanho"]
+    },
+    {
+      "id": "botao-nao-funciona",
+      "categoria": "problemas",
+      "pergunta": "Toquei no botão e nada aconteceu.",
+      "resumo": "Espere alguns segundos. Às vezes aparece uma mensagem pequena no canto de baixo da tela. Se nada mudar, toque de novo uma única vez.",
+      "palavrasChave": ["botao", "nao funciona", "travou", "nada acontece", "erro"]
+    },
+    {
+      "id": "me-perdi",
+      "categoria": "problemas",
+      "pergunta": "Me perdi e não sei onde estou.",
+      "resumo": "Olhe o título no alto da página: ele diz em qual tela você está. Para recomeçar, toque em ⌂ Visão geral no menu.",
+      "irPara": "inicio",
+      "palavrasChave": ["perdi", "onde estou", "confuso", "voltar", "recomecar"]
+    },
+    {
+      "id": "notificacoes",
+      "categoria": "problemas",
+      "pergunta": "Para que serve o sininho no alto da tela?",
+      "resumo": "É onde aparecem os avisos do CUIDAR. O pontinho colorido mostra que pode haver um aviso novo. Toque nele para ver.",
+      "palavrasChave": ["sino", "sininho", "aviso", "notificacao", "lembrete", "bolinha"]
+    }
+  ],
+  "aindaPrecisaDeAjuda": {
+    "titulo": "Ainda precisa de ajuda?",
+    "opcoes": [
+      { "icone": "👩‍⚕️", "texto": "Fale com a sua equipe de cuidado.", "botao": "Falar com a equipe", "irPara": "equipe" },
+      { "icone": "🤝", "texto": "Peça para um familiar ou cuidador sentar ao seu lado e ler estas respostas com você." }
+    ],
+    "emergencia": "Em caso de emergência, não use o CUIDAR. Ligue para o SAMU 192 ou vá ao pronto-atendimento mais próximo."
+  }
+}
