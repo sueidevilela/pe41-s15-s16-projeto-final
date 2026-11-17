@@ -1,0 +1,36 @@
+# --- Segredos: NUNCA vão para o GitHub ---
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+supabase/.temp/
+supabase/.branches/
+supabase/functions/.env
+.vercel/
+
+# --- Material bruto (obra protegida / anotações privadas) ---
+dados/brutos/*
+!dados/brutos/LEIA.md
+
+# --- Registros (podem conter texto digitado no Tradutor) ---
+logs/
+*.log
+npm-debug.log*
+
+# --- Dependências e builds ---
+node_modules/
+__pycache__/
+
+# --- Sistema e editor ---
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# --- Dados de teste exportados (podem conter dados pessoais) ---
+*.csv.bak
+exports/
+
+# --- Anotações de curso (obra protegida): ficam só no computador ---
+dados/limpos/trechos_paliativos.json

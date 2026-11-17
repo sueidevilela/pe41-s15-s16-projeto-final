@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Entrar · CUIDAR</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  /* Tela de login pensada para pessoas idosas: letra grande, rótulos sempre
+     visíveis, botões grandes e contraste alto (azul-marinho sobre branco). */
+  :root{
+    --bg:#f5f9fc; --surface:#ffffff; --navy:#173d62; --ink:#14293b; --muted:#3f5a70;
+    --blue:#1f6aa0; --blue-strong:#174f78; --line:#9fb8cb; --foco:#f2a900;
+    --erro:#9c2f25; --erro-fundo:#fdefed;
+  }
+  *{box-sizing:border-box}
+  html{font-size:20px}
+  body{margin:0;min-height:100vh;background:var(--bg);color:var(--ink);
+       font-family:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.5}
+  main{max-width:520px;margin:0 auto;padding:32px 20px 48px}
+  .marca{display:flex;align-items:center;gap:14px;margin:8px 0 28px}
+  .marca-icone{width:56px;height:56px;border-radius:16px;background:var(--blue);display:grid;place-items:center;flex:none}
+  .marca-icone svg{width:30px;height:30px;stroke:#fff;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+  .marca b{display:block;font-size:1.5rem;font-weight:800;color:var(--navy);letter-spacing:.04em}
+  .marca span{display:block;font-size:.9rem;color:var(--muted)}
+  .cartao{background:var(--surface);border:2px solid #d5e3ee;border-radius:24px;padding:28px 24px;box-shadow:0 10px 28px rgba(23,61,98,.08)}
+  h1{font-size:1.5rem;line-height:1.25;margin:0 0 6px;color:var(--navy)}
+  .sub{margin:0 0 24px;color:var(--muted);font-size:1rem}
+  .campo{margin-bottom:22px}
+  label{display:block;font-weight:700;font-size:1rem;margin-bottom:8px;color:var(--ink)}
+  input{width:100%;height:60px;padding:0 16px;font:inherit;font-size:1.05rem;color:var(--ink);
+        background:#fff;border:2px solid var(--line);border-radius:14px}
+  input:focus{outline:4px solid var(--foco);outline-offset:2px;border-color:var(--navy)}
+  .senha-linha{display:flex;gap:10px}
+  .senha-linha input{flex:1;min-width:0}
+  .btn-mostrar{flex:none;min-width:120px;height:60px;padding:0 14px;font:inherit;font-size:.9rem;font-weight:700;
+               color:var(--blue-strong);background:#eaf6fc;border:2px solid var(--line);border-radius:14px;cursor:pointer}
+  .btn-entrar{width:100%;height:64px;margin-top:6px;font:inherit;font-size:1.15rem;font-weight:800;color:#fff;
+              background:var(--blue);border:0;border-radius:16px;cursor:pointer}
+  .btn-entrar:hover{background:var(--blue-strong)}
+  .btn-entrar:disabled{opacity:.7;cursor:wait}
+  button:focus-visible{outline:4px solid var(--foco);outline-offset:3px}
+  .mensagem{margin:0 0 20px;padding:14px 16px;border-radius:14px;font-weight:700;font-size:1rem;
+            color:var(--erro);background:var(--erro-fundo);border:2px solid #e8b4ad}
+  .mensagem:empty{display:none}
+  .ajuda{margin:24px 4px 0;font-size:.95rem;color:var(--muted)}
+  .ajuda strong{color:var(--ink)}
+  @media (max-width:420px){ .senha-linha{flex-direction:column} .btn-mostrar{width:100%} }
+</style>
+</head>
+<body>
+
+<main>
+  <div class="marca">
+    <span class="marca-icone" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg></span>
+    <div><b>CUIDAR</b><span>Sua saúde, mais conectada</span></div>
+  </div>
+
+  <section class="cartao" aria-labelledby="titulo-login">
+    <h1 id="titulo-login">Entrar no CUIDAR</h1>
+    <p class="sub">Use o e-mail e a senha que você recebeu.</p>
+
+    <p class="mensagem" id="mensagem" role="alert" aria-live="assertive"></p>
+
+    <form id="formLogin" novalidate>
+      <div class="campo">
+        <label for="email">E-mail</label>
+        <input id="email" name="email" type="email" inputmode="email" autocomplete="username"
+               autocapitalize="none" spellcheck="false" required>
+      </div>
+      <div class="campo">
+        <label for="senha">Senha</label>
+        <div class="senha-linha">
+          <input id="senha" name="senha" type="password" autocomplete="current-password" required>
+          <button type="button" class="btn-mostrar" id="mostrarSenha" aria-controls="senha" aria-pressed="false">Mostrar senha</button>
+        </div>
+      </div>
+      <button type="submit" class="btn-entrar" id="btnEntrar">Entrar</button>
+    </form>
+  </section>
+
+  <p class="ajuda"><strong>Esqueceu a senha?</strong> Peça ajuda à pessoa responsável pelo CUIDAR.</p>
+  <p class="ajuda"><strong>Em emergência,</strong> ligue para o SAMU: 192.</p>
+</main>
+
+<script src="js/config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="js/supabase-cliente.js"></script>
+<script src="js/login.js"></script>
+</body>
+</html>

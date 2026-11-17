@@ -1,0 +1,1910 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CUIDAR | Jornada de saúde integrada</title>
+<meta name="description" content="CUIDAR v5 (v4 + Tradutor da Saúde ligado à biblioteca do CUIDAR e à IA pelo servidor local) — protótipo conceitual de gestão integrada da jornada de saúde hepática. Dados fictícios.">
+<!-- Única dependência externa permitida: Google Fonts (com fallback de sistema) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* =====================================================================
+   1. TOKENS — cores, sombras e raios (claro · escuro · alto contraste)
+   ===================================================================== */
+:root{
+  --scale:1;
+  --bg:#f5f9fc; --surface:#ffffff; --surface-2:#f8fbfd;
+  --sky:#eaf6fc; --sky-2:#d7edf8;
+  --blue:#287db7; --blue-strong:#1f6aa0; --navy:#173d62;
+  --teal:#43a6a0; --teal-strong:#2a7a75; --teal-soft:#e6f4f2;
+  --gold:#94621f; --gold-soft:#fdf3e6;
+  --alert:#b4473c; --alert-soft:#fdefed; --alert-line:#f4cfca;
+  --ink:#20384d; --muted:#5b7488; --faint:#7f96a8;
+  --line:#e3ecf2; --line-strong:#cfe0ea;
+  --on-primary:#ffffff;
+  --glass:rgba(255,255,255,.72);
+  --hero-a:#e4f3fa; --hero-b:#f6fbfe; --hero-c:#dcf0f3;
+  --shadow-sm:0 1px 2px rgba(23,61,98,.04),0 2px 8px rgba(23,61,98,.04);
+  --shadow-md:0 2px 4px rgba(23,61,98,.04),0 10px 28px rgba(23,61,98,.08);
+  --shadow-lg:0 6px 14px rgba(23,61,98,.06),0 28px 64px rgba(23,61,98,.16);
+  --r-xl:28px; --r-lg:22px; --r-md:16px; --r-sm:12px;
+  --ease:cubic-bezier(.22,.8,.26,1);
+  color-scheme:light;
+}
+[data-theme="dark"]{
+  --bg:#0c1824; --surface:#12212f; --surface-2:#162838;
+  --sky:#183247; --sky-2:#1f3e57;
+  --blue:#5aa9df; --blue-strong:#3f90c9; --navy:#e4f1fa;
+  --teal:#5cc0b8; --teal-strong:#86d8d1; --teal-soft:#143433;
+  --gold:#e2b36f; --gold-soft:#33291a;
+  --alert:#f39a8f; --alert-soft:#3a1f1d; --alert-line:#5c302b;
+  --ink:#d6e5f0; --muted:#a3b9ca; --faint:#7d97ab;
+  --line:#203649; --line-strong:#2b4760;
+  --on-primary:#04223a;
+  --glass:rgba(12,24,36,.74);
+  --hero-a:#15304a; --hero-b:#12233a; --hero-c:#123536;
+  --shadow-sm:0 1px 2px rgba(0,0,0,.25);
+  --shadow-md:0 2px 6px rgba(0,0,0,.25),0 12px 30px rgba(0,0,0,.25);
+  --shadow-lg:0 8px 20px rgba(0,0,0,.35),0 30px 70px rgba(0,0,0,.4);
+  color-scheme:dark;
+}
+[data-contrast="high"]{
+  --bg:#ffffff; --surface:#ffffff; --surface-2:#ffffff;
+  --sky:#e3f0f9; --sky-2:#b7d6ea;
+  --blue:#0a4f87; --blue-strong:#063a66; --navy:#001f3a;
+  --teal:#00675f; --teal-strong:#00514b; --teal-soft:#dff1ee;
+  --gold:#6b4510; --gold-soft:#fbefdc;
+  --alert:#8f1d12; --alert-soft:#fde9e6; --alert-line:#8f1d12;
+  --ink:#000000; --muted:#1e2b36; --faint:#2f3f4d;
+  --line:#2f4357; --line-strong:#1e2b36;
+  --on-primary:#ffffff; --glass:rgba(255,255,255,.97);
+  --hero-a:#ffffff; --hero-b:#ffffff; --hero-c:#ffffff;
+  --shadow-sm:none; --shadow-md:none; --shadow-lg:0 0 0 2px #000;
+}
+[data-theme="dark"][data-contrast="high"]{
+  --bg:#000000; --surface:#000000; --surface-2:#0a0a0a;
+  --sky:#0e2233; --sky-2:#18405f;
+  --blue:#8fd0ff; --blue-strong:#bfe4ff; --navy:#ffffff;
+  --teal:#7ff0e4; --teal-strong:#a8fff5; --teal-soft:#002a26;
+  --gold:#ffd27a; --gold-soft:#2a1f00;
+  --alert:#ffb1a8; --alert-soft:#2a0d0a; --alert-line:#ffb1a8;
+  --ink:#ffffff; --muted:#e8f0f6; --faint:#cfdbe4;
+  --line:#cfdbe4; --line-strong:#ffffff;
+  --on-primary:#000000; --glass:rgba(0,0,0,.96);
+  --hero-a:#000; --hero-b:#000; --hero-c:#000;
+  --shadow-lg:0 0 0 2px #fff;
+}
+
+/* =====================================================================
+   2. BASE
+   ===================================================================== */
+*,*::before,*::after{box-sizing:border-box}
+html{font-size:calc(100% * var(--scale));scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Plus Jakarta Sans",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:1rem;line-height:1.55;-webkit-font-smoothing:antialiased;transition:background-color .3s,color .3s}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+h1,h2,h3,h4{margin:0;color:var(--navy);letter-spacing:-.02em;line-height:1.25}
+p{margin:0}
+ul,ol{margin:0;padding:0}
+svg.i{width:1.25em;height:1.25em;flex:none;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;vertical-align:middle}
+:focus-visible{outline:3px solid var(--teal);outline-offset:3px}
+[tabindex="-1"]:focus{outline:none}
+.sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.skip-link{position:fixed;left:16px;top:-80px;z-index:100;background:var(--navy);color:var(--surface);padding:12px 18px;border-radius:12px;font-weight:700;text-decoration:none;transition:top .2s}
+.skip-link:focus{top:16px}
+.eyebrow{font-size:.72rem;font-weight:700;color:var(--muted);letter-spacing:.14em;text-transform:uppercase}
+
+/* =====================================================================
+   3. LAYOUT — app, barra lateral, topbar (glass), rodapé
+   ===================================================================== */
+.app{display:grid;grid-template-columns:288px minmax(0,1fr);min-height:100vh}
+.sidebar{position:sticky;top:0;height:100vh;overflow-y:auto;background:var(--surface);border-right:1px solid var(--line);padding:26px 18px 22px;display:flex;flex-direction:column;gap:24px;z-index:60}
+.brand{display:flex;align-items:center;gap:12px;padding:0 8px}
+.brand svg{width:44px;height:44px;flex:none;filter:drop-shadow(0 8px 14px rgba(40,125,183,.25))}
+.brand strong{font-size:1.3rem;letter-spacing:.16em;color:var(--navy);font-weight:800;display:block;line-height:1}
+.brand small{display:block;color:var(--muted);font-size:.64rem;letter-spacing:.16em;margin-top:5px;font-weight:600}
+.nav-label{font-size:.7rem;text-transform:uppercase;letter-spacing:.14em;color:var(--muted);font-weight:700;padding:0 14px;margin:0 0 8px}
+.nav{display:grid;gap:3px}
+.nav-btn{display:flex;align-items:center;gap:12px;width:100%;border:0;background:transparent;color:var(--muted);text-align:left;padding:8px 12px;border-radius:14px;font-size:.92rem;font-weight:600;position:relative;transition:background-color .2s,color .2s}
+.nav-btn .ico{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;background:var(--surface-2);border:1px solid var(--line);transition:background .25s,color .25s,border-color .25s,transform .25s var(--ease)}
+.nav-btn:hover{background:var(--sky);color:var(--blue-strong)}
+.nav-btn:hover .ico{transform:scale(1.06)}
+.nav-btn[aria-current="page"]{background:var(--sky);color:var(--navy);font-weight:700}
+.nav-btn[aria-current="page"] .ico{background:linear-gradient(140deg,var(--blue),var(--blue-strong));color:var(--on-primary);border-color:transparent;box-shadow:0 6px 14px rgba(40,125,183,.3)}
+.nav-btn[aria-current="page"]::before{content:"";position:absolute;left:-18px;top:12px;bottom:12px;width:4px;border-radius:0 4px 4px 0;background:var(--blue)}
+.sidebar-bottom{margin-top:auto;display:grid;gap:16px}
+.help-card{position:relative;overflow:hidden;background:linear-gradient(150deg,var(--sky),var(--surface-2));border:1px solid var(--line);border-radius:var(--r-lg);padding:18px}
+.help-card::after{content:"";position:absolute;width:120px;height:120px;right:-40px;top:-50px;border-radius:50%;border:1px solid var(--sky-2);box-shadow:0 0 0 16px rgba(255,255,255,.18),0 0 0 32px rgba(255,255,255,.1)}
+.help-card .help-ico{width:38px;height:38px;border-radius:12px;background:var(--surface);display:grid;place-items:center;color:var(--blue);margin-bottom:10px;box-shadow:var(--shadow-sm)}
+.help-card b{font-size:.95rem;color:var(--navy)}
+.help-card p{font-size:.8rem;line-height:1.55;color:var(--muted);margin:6px 0 12px}
+.profile{display:flex;align-items:center;gap:11px;padding:14px 8px 0;border-top:1px solid var(--line)}
+.avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(140deg,var(--sky-2),var(--teal-soft));color:var(--navy);display:grid;place-items:center;font-weight:800;font-size:.8rem;flex:none}
+.profile b{font-size:.9rem;color:var(--navy)}
+.profile small{display:block;color:var(--muted);font-size:.74rem;margin-top:2px}
+.scrim{display:none}
+
+.main{min-width:0;padding:0 40px 40px;max-width:1440px;width:100%;margin:0 auto}
+.topbar{position:sticky;top:0;z-index:40;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 0;margin-bottom:14px}
+.topbar::before{content:"";position:absolute;inset:0 -40px;background:var(--glass);-webkit-backdrop-filter:blur(18px) saturate(1.5);backdrop-filter:blur(18px) saturate(1.5);border-bottom:1px solid var(--line);z-index:-1}
+.title-wrap{display:flex;align-items:center;gap:12px;min-width:0}
+.topbar h1{font-size:1.6rem;font-weight:800;margin-top:3px}
+.tools{display:flex;align-items:center;gap:8px}
+.tools-panel{display:flex;align-items:center;gap:8px}
+.icon-btn{width:44px;height:44px;border-radius:14px;border:1px solid var(--line);background:var(--surface);color:var(--muted);display:grid;place-items:center;position:relative;transition:background .2s,color .2s,border-color .2s,transform .2s var(--ease),box-shadow .2s;flex:none}
+.icon-btn:hover{color:var(--blue-strong);border-color:var(--line-strong);transform:translateY(-1px);box-shadow:var(--shadow-sm)}
+.icon-btn[aria-pressed="true"]{background:var(--sky);color:var(--navy);border-color:var(--blue)}
+.icon-btn .dot{position:absolute;width:9px;height:9px;background:#ef8c7f;border:2px solid var(--surface);border-radius:50%;top:9px;right:10px}
+.seg{display:flex;align-items:center;border:1px solid var(--line);border-radius:14px;background:var(--surface);padding:3px;height:44px}
+.seg button{border:0;background:transparent;height:36px;min-width:40px;border-radius:11px;font-weight:800;color:var(--muted);font-size:.85rem;transition:background .2s,color .2s}
+.seg button:hover:not(:disabled){background:var(--sky);color:var(--navy)}
+.seg button:disabled{opacity:.4;cursor:not-allowed}
+.seg .sep{width:1px;height:20px;background:var(--line)}
+.menu-btn,.a11y-toggle{display:none}
+[data-theme="dark"] .when-light,[data-theme="light"] .when-dark{display:none}
+
+.footer{margin-top:44px;text-align:center;color:var(--muted);font-size:.78rem;line-height:1.7;padding:22px 16px;border-top:1px solid var(--line)}
+.footer .foot-mark{display:inline-flex;align-items:center;gap:8px;font-weight:700;color:var(--navy);margin-bottom:4px}
+
+/* =====================================================================
+   4. COMPONENTES — botões, cards, tags, avisos, campos, chips
+   ===================================================================== */
+.btn-primary{display:inline-flex;align-items:center;justify-content:center;gap:9px;border:0;background:linear-gradient(135deg,var(--blue),var(--blue-strong));color:var(--on-primary);padding:12px 20px;min-height:46px;border-radius:14px;font-weight:700;font-size:.92rem;box-shadow:0 6px 16px rgba(40,125,183,.28);transition:transform .2s var(--ease),box-shadow .2s,filter .2s;white-space:nowrap}
+.btn-primary:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 10px 24px rgba(40,125,183,.34);filter:saturate(1.1)}
+.btn-primary:active{transform:translateY(0)}
+.btn-primary:disabled{opacity:.75;cursor:progress}
+.btn-soft{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--surface);color:var(--blue-strong);padding:9px 14px;border-radius:12px;font-weight:700;font-size:.82rem;transition:background .2s,border-color .2s,transform .2s var(--ease)}
+.btn-soft:hover{background:var(--sky);border-color:var(--line-strong);transform:translateY(-1px)}
+.btn-link{display:inline-flex;align-items:center;gap:6px;border:0;background:transparent;color:var(--blue-strong);font-weight:700;font-size:.82rem;padding:6px 8px;border-radius:10px;transition:background .2s,gap .2s}
+.btn-link:hover{background:var(--sky);gap:9px}
+.spinner{width:18px;height:18px;border-radius:50%;border:2.5px solid rgba(255,255,255,.4);border-top-color:currentColor;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:22px;box-shadow:var(--shadow-sm);transition:box-shadow .25s,transform .25s var(--ease),border-color .25s}
+.card.lift:hover{box-shadow:var(--shadow-md);transform:translateY(-2px)}
+.section-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:26px 0 12px}
+.section-head h3{font-size:1.05rem;font-weight:800}
+.card-title{font-size:1.05rem;font-weight:800;color:var(--navy)}
+.card-sub{font-size:.88rem;color:var(--muted);margin-top:4px}
+
+.tag{display:inline-flex;align-items:center;gap:5px;font-size:.72rem;font-weight:700;background:var(--teal-soft);color:var(--teal-strong);padding:5px 10px;border-radius:999px;white-space:nowrap}
+.tag.blue{background:var(--sky);color:var(--blue-strong)}
+.tag.gold{background:var(--gold-soft);color:var(--gold)}
+.tag.ghost{background:transparent;border:1px solid var(--line-strong);color:var(--muted)}
+
+.notice{display:flex;gap:10px;align-items:flex-start;font-size:.85rem;line-height:1.55;color:var(--muted);background:var(--surface-2);border:1px solid var(--line);border-radius:var(--r-md);padding:12px 14px;margin-top:16px}
+.notice .i{color:var(--blue);margin-top:1px}
+.notice.alert{background:var(--alert-soft);border-color:var(--alert-line);color:var(--ink)}
+.notice.alert .i{color:var(--alert)}
+.notice.alert b{color:var(--alert)}
+.notice.teal{background:var(--teal-soft);border-color:transparent;color:var(--ink)}
+.notice.teal .i{color:var(--teal-strong)}
+
+.field{display:grid;gap:7px;margin:14px 0}
+.field label,.field .label{font-size:.85rem;color:var(--ink);font-weight:700}
+.field input,.field textarea,.field select,.search input{border:1.5px solid var(--line);border-radius:14px;padding:13px 14px;font-size:.95rem;color:var(--ink);background:var(--surface-2);outline:none;transition:border-color .2s,box-shadow .2s,background .2s;width:100%}
+.field textarea{min-height:120px;resize:vertical;line-height:1.55}
+.field input:focus,.field textarea:focus,.field select:focus,.search input:focus{border-color:var(--blue);background:var(--surface);box-shadow:0 0 0 4px color-mix(in srgb,var(--blue) 18%,transparent)}
+.field input::placeholder,.field textarea::placeholder,.search input::placeholder{color:var(--faint)}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
+.actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:6px}
+
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:inline-flex;align-items:center;gap:7px;border:1.5px solid var(--line-strong);background:var(--surface);color:var(--ink);border-radius:999px;padding:8px 14px;font-weight:600;font-size:.84rem;transition:background .2s,color .2s,border-color .2s,transform .2s var(--ease)}
+.chip:hover{border-color:var(--blue);transform:translateY(-1px)}
+.chip[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:var(--surface)}
+.chip .chk{display:none}
+.chip[aria-pressed="true"] .chk{display:inline}
+.chip.example{border-style:dashed;color:var(--blue-strong)}
+.chip.example:hover{background:var(--sky)}
+
+/* Área expansível genérica (linha do tempo, equipe) */
+.collapse{display:grid;grid-template-rows:0fr;transition:grid-template-rows .35s var(--ease)}
+.collapse>div{overflow:hidden;min-height:0}
+.is-open>.collapse{grid-template-rows:1fr}
+.chev{transition:transform .3s var(--ease);color:var(--muted)}
+.is-open .chev{transform:rotate(180deg)}
+
+/* =====================================================================
+   5. ANIMAÇÕES — transição de telas e entrada escalonada
+   ===================================================================== */
+.page{display:none}
+.page.active{display:block;animation:pageIn .45s var(--ease)}
+.page.active .reveal{animation:rise .6s var(--ease) both;animation-delay:calc(var(--i,0) * 70ms)}
+@keyframes pageIn{from{opacity:0}to{opacity:1}}
+@keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@keyframes grow{from{width:0}}
+@keyframes draw{from{stroke-dashoffset:var(--len,600)}to{stroke-dashoffset:0}}
+@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes pulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--blue) 45%,transparent)}100%{box-shadow:0 0 0 12px transparent}}
+@keyframes shimmer{from{background-position:-200% 0}to{background-position:200% 0}}
+@keyframes blink{50%{opacity:0}}
+
+/* =====================================================================
+   6. TELA — VISÃO GERAL
+   ===================================================================== */
+.welcome{position:relative;overflow:hidden;border-radius:var(--r-xl);padding:32px 36px;background:radial-gradient(circle at 85% 20%,color-mix(in srgb,var(--teal) 16%,transparent),transparent 45%),linear-gradient(115deg,var(--hero-a),var(--hero-b) 55%,var(--hero-c));border:1px solid var(--line);display:grid;grid-template-columns:minmax(0,1fr) auto;gap:24px;align-items:center;margin-bottom:22px}
+.welcome h2{font-size:clamp(1.45rem,2.6vw,2rem);font-weight:800;margin:8px 0 10px;max-width:520px}
+.welcome p{font-size:.98rem;color:var(--muted);max-width:520px;line-height:1.65}
+.date-chip{display:inline-flex;align-items:center;gap:8px;margin-top:18px;font-size:.82rem;font-weight:600;color:var(--blue-strong);background:var(--glass);border:1px solid var(--line);border-radius:999px;padding:8px 14px;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.welcome-art{width:min(300px,32vw)}
+.welcome-art svg{width:100%;height:auto;display:block;animation:floaty 7s ease-in-out infinite}
+.art-ring{fill:none;stroke:var(--sky-2);stroke-width:1.5}
+.art-ring.dash{stroke-dasharray:4 7}
+.art-pulse{fill:none;stroke:var(--teal);stroke-width:3.5;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:600;--len:600;animation:draw 2.4s var(--ease) .3s both}
+.art-white{fill:none;stroke:rgba(255,255,255,.75);stroke-width:2.5;stroke-linecap:round}
+.art-dot{fill:var(--teal)}
+.art-dot.b{fill:var(--blue)}
+.art-heart{fill:#ef8c7f}
+
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-bottom:6px}
+.stat{display:flex;align-items:center;gap:16px;padding:20px}
+.stat-icon{width:52px;height:52px;border-radius:16px;display:grid;place-items:center;color:var(--blue);background:linear-gradient(145deg,var(--sky),var(--surface-2));border:1px solid var(--line);flex:none}
+.stat-icon .i{width:26px;height:26px}
+.stat:nth-child(2) .stat-icon{color:var(--teal-strong);background:linear-gradient(145deg,var(--teal-soft),var(--surface-2))}
+.stat-label{font-size:.8rem;color:var(--muted);font-weight:600}
+.stat strong{display:block;font-size:2.2rem;line-height:1.1;font-weight:800;color:var(--navy);font-variant-numeric:tabular-nums;margin:2px 0}
+.stat small{font-size:.78rem;color:var(--muted)}
+
+.grid-main{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:22px}
+.bottom-grid{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:22px;margin-top:4px}
+.right-stack{display:grid;gap:18px;align-content:start;margin-top:26px}
+
+/* Linha do tempo expansível */
+.timeline{list-style:none;padding:8px 22px}
+.event{position:relative;border-bottom:1px solid var(--line)}
+.event:last-child{border-bottom:0}
+.event:not(:last-child)::before{content:"";position:absolute;left:21px;top:62px;bottom:-14px;width:2px;background:linear-gradient(var(--sky-2),transparent);z-index:0}
+.event-btn{width:100%;display:grid;grid-template-columns:44px minmax(0,1fr) auto 22px;gap:14px;align-items:center;text-align:left;border:0;background:transparent;padding:14px 0;border-radius:14px;position:relative;z-index:1}
+.event-btn:hover .event-title{color:var(--blue-strong)}
+.event-icon{width:44px;height:44px;border-radius:14px;background:var(--sky);color:var(--blue);display:grid;place-items:center;transition:transform .25s var(--ease)}
+.event-btn:hover .event-icon{transform:scale(1.07)}
+.event-icon.teal{background:var(--teal-soft);color:var(--teal-strong)}
+.event-icon.gold{background:var(--gold-soft);color:var(--gold)}
+.event-title{display:block;font-size:.95rem;font-weight:700;color:var(--navy);transition:color .2s}
+.event-desc{display:block;font-size:.84rem;color:var(--muted);margin-top:3px;line-height:1.5}
+.event time{font-size:.8rem;color:var(--muted);font-weight:600;white-space:nowrap}
+.event-detail{padding:0 0 16px 58px}
+.event-detail .box{background:var(--surface-2);border:1px dashed var(--line-strong);border-radius:14px;padding:12px 14px;font-size:.86rem;color:var(--ink);line-height:1.6}
+.event-detail .meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+
+/* Próximo compromisso */
+.appt{position:relative;overflow:hidden;border:0;color:#fff;background:linear-gradient(145deg,#2f88bd,#24618d 60%,#1d4f78);box-shadow:0 14px 34px rgba(31,95,140,.28)}
+.appt::after{content:"";position:absolute;width:170px;height:170px;border:1px solid rgba(255,255,255,.22);border-radius:50%;right:-60px;top:-70px;box-shadow:0 0 0 24px rgba(255,255,255,.06),0 0 0 48px rgba(255,255,255,.04)}
+.appt .appt-muted{color:#d6ebf6;font-size:.74rem;font-weight:700;letter-spacing:.12em}
+.appt h3{color:#fff;font-size:1.2rem;margin:10px 0 0}
+.appt-meta{display:flex;flex-wrap:wrap;gap:10px;margin:16px 0 10px}
+.appt-meta span{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.2);border-radius:999px;padding:7px 12px;font-size:.84rem;font-weight:600}
+.appt .place{color:#e2f2f8;font-size:.86rem}
+.btn-light{display:inline-flex;align-items:center;gap:8px;margin-top:16px;border:0;border-radius:12px;background:#fff;color:#1f6aa0;padding:10px 16px;font-size:.86rem;font-weight:800;transition:transform .2s var(--ease),box-shadow .2s;position:relative;z-index:1}
+.btn-light:hover{transform:translateY(-2px);box-shadow:0 8px 18px rgba(0,0,0,.18)}
+[data-contrast="high"] .appt{background:var(--surface);color:var(--ink);border:2px solid var(--ink);box-shadow:none}
+[data-contrast="high"] .appt h3{color:var(--navy)}
+[data-contrast="high"] .appt .appt-muted,[data-contrast="high"] .appt .place{color:var(--muted)}
+[data-contrast="high"] .appt-meta span{background:transparent;border-color:var(--ink)}
+[data-contrast="high"] .btn-light{background:var(--blue);color:var(--on-primary)}
+
+/* Especialidades (mini) */
+.specialties{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:14px}
+.specialty{display:flex;align-items:center;gap:11px;border:1px solid var(--line);border-radius:14px;padding:12px;background:var(--surface-2);transition:border-color .2s,transform .2s var(--ease)}
+.specialty:hover{border-color:var(--line-strong);transform:translateY(-1px)}
+.specialty .s-ico{width:38px;height:38px;border-radius:12px;background:var(--surface);color:var(--blue);display:grid;place-items:center;flex:none;border:1px solid var(--line)}
+.specialty b{font-size:.86rem;color:var(--navy);display:block;line-height:1.3}
+.specialty small{display:block;color:var(--muted);font-size:.76rem;margin-top:2px}
+
+/* Documentos (linhas) */
+.doc-list{list-style:none}
+.doc-row{display:flex;align-items:center;gap:14px;padding:12px 0;border-bottom:1px solid var(--line)}
+.doc-row:last-child{border-bottom:0}
+.doc-ext{width:44px;height:50px;border-radius:12px;background:linear-gradient(160deg,var(--sky),var(--surface-2));border:1px solid var(--line);display:grid;place-items:center;color:var(--blue-strong);font-size:.68rem;font-weight:800;letter-spacing:.04em;flex:none;position:relative}
+.doc-ext::after{content:"";position:absolute;top:-1px;right:-1px;width:12px;height:12px;background:var(--surface);border-left:1px solid var(--line);border-bottom:1px solid var(--line);border-radius:0 12px 0 6px}
+.doc-ext.img{color:var(--teal-strong);background:linear-gradient(160deg,var(--teal-soft),var(--surface-2))}
+.doc-info{min-width:0;flex:1}
+.doc-info b{font-size:.92rem;color:var(--navy);display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.doc-info small{display:block;font-size:.8rem;color:var(--muted);margin-top:2px}
+.doc-row .tag{margin-right:4px}
+.doc-row.is-new{animation:rise .5s var(--ease)}
+
+.progress{height:10px;background:var(--sky);border-radius:10px;overflow:hidden;margin:14px 0 8px}
+.progress span{display:block;width:72%;height:100%;background:linear-gradient(90deg,var(--teal),var(--blue));border-radius:10px}
+.page.active .progress span{animation:grow 1.4s var(--ease) .4s both}
+.journey-head{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.journey-head b{font-size:.95rem;color:var(--navy)}
+.progress-meta{display:flex;justify-content:space-between;font-size:.8rem;color:var(--muted)}
+.care-note{position:relative;overflow:hidden;background:linear-gradient(140deg,var(--teal-soft),var(--surface-2));border:1px solid var(--line);border-radius:18px;padding:16px;display:flex;gap:14px;margin-top:18px}
+.care-note .round{width:42px;height:42px;flex:none;background:var(--surface);color:var(--teal-strong);border-radius:50%;display:grid;place-items:center;box-shadow:var(--shadow-sm)}
+.care-note b{font-size:.92rem;color:var(--navy)}
+.care-note p{font-size:.85rem;color:var(--muted);line-height:1.6;margin-top:4px}
+
+/* =====================================================================
+   7. TELAS INTERNAS — hero, formulários e resultados
+   ===================================================================== */
+.feature-page{max-width:1000px}
+.hero{position:relative;overflow:hidden;border-radius:var(--r-xl);padding:30px 32px;background:linear-gradient(120deg,var(--hero-a),var(--hero-b) 60%,var(--hero-c));border:1px solid var(--line);margin-bottom:20px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:20px;align-items:start}
+.hero-ico{width:58px;height:58px;border-radius:18px;background:linear-gradient(145deg,var(--blue),var(--blue-strong));color:var(--on-primary);display:grid;place-items:center;box-shadow:0 10px 22px rgba(40,125,183,.28)}
+.hero-ico .i{width:28px;height:28px}
+.hero h2{font-size:clamp(1.35rem,2.4vw,1.8rem);font-weight:800;margin:6px 0 8px}
+.hero p{color:var(--muted);font-size:.96rem;line-height:1.65;max-width:680px}
+.hero .lines{position:absolute;right:-20px;bottom:-10px;width:300px;opacity:.9;pointer-events:none}
+.hero .lines path{fill:none;stroke:var(--sky-2);stroke-width:1.6}
+.hero .lines path.t{stroke:color-mix(in srgb,var(--teal) 35%,transparent)}
+.hero>div{position:relative;z-index:1}
+
+.result{margin-top:18px;border-radius:18px;border:1px solid var(--line);background:linear-gradient(180deg,var(--sky),var(--surface-2) 70%);padding:18px 20px}
+.result[hidden]{display:none}
+.result-head{display:flex;align-items:center;gap:10px;font-weight:800;color:var(--navy);font-size:.95rem;margin-bottom:6px}
+.result-head .badge{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;background:var(--surface);color:var(--blue);box-shadow:var(--shadow-sm)}
+.result-msg{font-size:.9rem;color:var(--ink);line-height:1.6}
+.r-section{margin-top:14px;padding:14px 16px;background:var(--surface);border:1px solid var(--line);border-radius:14px;animation:rise .45s var(--ease) both}
+.r-section h4{display:flex;align-items:center;gap:9px;font-size:.9rem;font-weight:800;margin-bottom:8px}
+.r-section h4 .i{color:var(--blue)}
+.r-section.s2 h4 .i{color:var(--gold)}
+.r-section.s3 h4 .i{color:var(--teal-strong)}
+.r-section.s4 h4 .i{color:var(--alert)}
+.r-section ul{list-style:none;display:grid;gap:7px}
+.r-section li{position:relative;padding-left:18px;font-size:.9rem;line-height:1.6;color:var(--ink);min-height:1.6em}
+.r-section li::before{content:"";position:absolute;left:2px;top:.62em;width:7px;height:7px;border-radius:50%;background:var(--line-strong)}
+.r-section li.empty{color:var(--muted);font-style:italic}
+.typing::after{content:"";display:inline-block;width:2px;height:1em;margin-left:2px;background:var(--blue);vertical-align:-2px;animation:blink 1s steps(1) infinite}
+.r-foot{font-size:.82rem;color:var(--muted);margin-top:12px;display:flex;gap:8px;align-items:flex-start}
+.skeleton{display:grid;gap:10px;margin-top:10px}
+.skeleton span{height:12px;border-radius:8px;background:linear-gradient(90deg,var(--line) 25%,var(--surface) 50%,var(--line) 75%);background-size:200% 100%;animation:shimmer 1.3s linear infinite}
+.skeleton span:nth-child(2){width:85%}.skeleton span:nth-child(3){width:65%}
+.info-box{display:flex;gap:12px;align-items:flex-start;background:var(--surface-2);border:1px solid var(--line);border-radius:16px;padding:14px 16px;font-size:.88rem;color:var(--muted);line-height:1.6;margin-top:16px}
+.info-box .i{color:var(--teal-strong);margin-top:2px}
+.examples{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:4px 0 4px}
+.examples .lbl{font-size:.8rem;font-weight:700;color:var(--muted);margin-right:2px}
+
+/* Documentos: arrastar e soltar, filtros e busca */
+.dropzone{position:relative;display:grid;place-items:center;text-align:center;gap:6px;border:2px dashed var(--line-strong);border-radius:20px;padding:28px 18px;background:linear-gradient(180deg,var(--surface-2),var(--sky));cursor:pointer;transition:border-color .2s,background .2s,transform .2s var(--ease)}
+.dropzone:hover,.dropzone.drag{border-color:var(--blue);transform:scale(1.005)}
+.dropzone.drag{background:var(--sky)}
+.dropzone:focus-within{outline:3px solid var(--teal);outline-offset:3px}
+.dropzone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%}
+.dz-ico{width:56px;height:56px;border-radius:18px;display:grid;place-items:center;background:var(--surface);color:var(--blue);box-shadow:var(--shadow-sm)}
+.dz-ico .i{width:28px;height:28px}
+.dropzone b{color:var(--navy);font-size:.95rem}
+.dropzone small{color:var(--muted);font-size:.8rem}
+.file-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.file-chips span{display:inline-flex;align-items:center;gap:6px;font-size:.78rem;font-weight:600;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:5px 10px;color:var(--ink);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.doc-tools{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin:6px 0 10px}
+.search{position:relative;flex:1 1 220px;max-width:320px}
+.search .i{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted)}
+.search input{padding-left:40px;min-height:44px}
+.empty-state{text-align:center;color:var(--muted);font-size:.9rem;padding:24px 10px}
+
+/* Jornada: stepper com faixa paliativa atravessando as fases */
+.journey-board{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px 14px;position:relative;padding:22px}
+.journey-board::before{content:"";position:absolute;top:48px;left:calc(12.5% + 8px);right:calc(12.5% + 8px);height:3px;border-radius:3px;background:linear-gradient(90deg,var(--sky-2),var(--blue));z-index:0}
+.step{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;border:0;background:transparent;padding:0}
+.step-node{width:54px;height:54px;border-radius:50%;display:grid;place-items:center;background:var(--surface);color:var(--blue);border:2px solid var(--sky-2);box-shadow:var(--shadow-sm);transition:transform .25s var(--ease),background .25s,color .25s,border-color .25s;position:relative}
+.step-node .num{position:absolute;top:-6px;right:-6px;width:22px;height:22px;border-radius:50%;background:var(--navy);color:var(--surface);font-size:.7rem;font-weight:800;display:grid;place-items:center}
+.step-body{width:100%;border:1.5px solid var(--line);background:var(--surface);border-radius:18px;padding:14px;transition:border-color .25s,box-shadow .25s,transform .25s var(--ease);flex:1;display:flex;flex-direction:column;align-items:center;gap:8px}
+.step-body b{font-size:.9rem;color:var(--navy);line-height:1.3}
+.step-body .s-desc{font-size:.8rem;color:var(--muted);line-height:1.5}
+.step:hover .step-body{border-color:var(--line-strong);transform:translateY(-2px);box-shadow:var(--shadow-md)}
+.step:hover .step-node{transform:scale(1.06)}
+.step[aria-pressed="true"] .step-node{background:linear-gradient(145deg,var(--blue),var(--blue-strong));color:var(--on-primary);border-color:transparent;animation:pulse 1.6s ease-out 2}
+.step[aria-pressed="true"] .step-body{border-color:var(--blue);box-shadow:var(--shadow-md)}
+.here{font-size:.68rem;font-weight:800;color:var(--teal-strong);display:inline-flex;align-items:center;gap:4px}
+.band{grid-column:1 / -1;position:relative;margin-top:14px;border-radius:20px;border:2px dashed var(--teal);background:linear-gradient(90deg,color-mix(in srgb,var(--teal) 10%,var(--surface)),color-mix(in srgb,var(--teal) 22%,var(--surface)),color-mix(in srgb,var(--teal) 10%,var(--surface)));padding:14px 18px;display:flex;align-items:center;gap:14px;text-align:left;color:var(--ink);transition:box-shadow .25s,transform .25s var(--ease)}
+.band:hover{transform:translateY(-2px);box-shadow:var(--shadow-md)}
+.band[aria-pressed="true"]{border-style:solid;box-shadow:0 0 0 4px color-mix(in srgb,var(--teal) 22%,transparent)}
+.band .b-ico{width:44px;height:44px;border-radius:50%;background:var(--teal);color:#fff;display:grid;place-items:center;flex:none}
+[data-theme="dark"] .band .b-ico{color:#062a27}
+.band .b-txt b{display:block;color:var(--navy);font-size:.95rem}
+.band .b-txt span{display:block;font-size:.82rem;color:var(--muted);line-height:1.5}
+.band .tag{margin-left:auto}
+.band-ticks{position:absolute;left:-20px;right:-20px;top:-18px;height:16px;display:grid;grid-template-columns:repeat(4,1fr);pointer-events:none}
+.band-ticks i{justify-self:center;width:2px;height:16px;background:var(--teal);border-radius:2px;position:relative}
+.band-ticks i::after{content:"";position:absolute;left:50%;top:-4px;width:8px;height:8px;margin-left:-4px;border-radius:50%;background:var(--teal)}
+.journey-detail{margin-top:18px}
+.jd-head{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.jd-head .event-icon{width:50px;height:50px}
+.jd-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.jd-grid div{background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:12px 14px;font-size:.86rem;line-height:1.6}
+.jd-grid b{display:block;font-size:.78rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:4px}
+
+/* Equipe: cards expansíveis e formulário de contato */
+.team-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.team-card{border:1px solid var(--line);border-radius:18px;background:var(--surface);box-shadow:var(--shadow-sm);transition:border-color .25s,box-shadow .25s}
+.team-card:hover{box-shadow:var(--shadow-md)}
+.team-card.is-open{border-color:var(--blue)}
+.team-btn{width:100%;display:flex;align-items:center;gap:12px;border:0;background:transparent;text-align:left;padding:14px 16px;border-radius:18px}
+.team-btn .s-ico{width:44px;height:44px;border-radius:14px;background:var(--sky);color:var(--blue);display:grid;place-items:center;flex:none;transition:transform .25s var(--ease)}
+.team-card:hover .s-ico{transform:rotate(-6deg) scale(1.05)}
+.team-btn b{display:block;font-size:.92rem;color:var(--navy);line-height:1.3}
+.team-btn small{display:block;font-size:.8rem;color:var(--muted);margin-top:2px}
+.team-btn .chev{margin-left:auto}
+.team-role{padding:0 16px 16px 72px;font-size:.86rem;line-height:1.6;color:var(--ink)}
+.team-role .lbl{display:block;font-size:.72rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--teal-strong);margin-bottom:3px}
+.topics{display:grid;grid-template-columns:1fr 1fr;gap:10px;border:0;margin:0;padding:0}
+.topics legend{font-size:.85rem;font-weight:700;margin-bottom:8px;padding:0}
+.topic{position:relative;display:flex;gap:10px;align-items:flex-start;border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;background:var(--surface-2);cursor:pointer;font-size:.88rem;line-height:1.45;transition:border-color .2s,background .2s}
+.topic:hover{border-color:var(--line-strong)}
+.topic input{position:absolute;opacity:0;width:1px;height:1px}
+.topic .radio{width:20px;height:20px;border-radius:50%;border:2px solid var(--line-strong);flex:none;margin-top:1px;display:grid;place-items:center;transition:border-color .2s}
+.topic .radio::after{content:"";width:10px;height:10px;border-radius:50%;background:var(--blue);transform:scale(0);transition:transform .2s var(--ease)}
+.topic:has(input:checked){border-color:var(--blue);background:var(--sky)}
+.topic:has(input:checked) .radio{border-color:var(--blue)}
+.topic:has(input:checked) .radio::after{transform:scale(1)}
+.topic:has(input:focus-visible){outline:3px solid var(--teal);outline-offset:2px}
+.protocol{display:flex;flex-wrap:wrap;align-items:center;gap:10px;justify-content:space-between;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-top:12px}
+.protocol code{font-family:ui-monospace,"Cascadia Code",Consolas,monospace;font-size:1rem;font-weight:700;color:var(--navy);letter-spacing:.04em}
+.status-track{list-style:none;display:flex;align-items:center;gap:0;margin-top:14px}
+.status-track li{display:flex;align-items:center;gap:10px;flex:1}
+.status-track li+li::before{content:"";flex:1;height:3px;border-radius:3px;background:var(--line);margin:0 12px;transition:background .5s}
+.status-track li.done+li::before,.status-track li.current::before{background:linear-gradient(90deg,var(--teal),var(--blue))}
+.status-track .sdot{width:34px;height:34px;border-radius:50%;border:2px solid var(--line-strong);display:grid;place-items:center;background:var(--surface);color:var(--muted);flex:none;transition:all .4s}
+.status-track .done .sdot{background:var(--teal);border-color:var(--teal);color:#fff}
+.status-track .current .sdot{background:var(--blue);border-color:var(--blue);color:var(--on-primary);animation:pulse 1.6s ease-out infinite}
+.status-track b{display:block;font-size:.88rem;color:var(--navy)}
+.status-track small{display:block;font-size:.76rem;color:var(--muted)}
+
+/* Cuidados paliativos */
+.pal-hero{grid-template-columns:auto minmax(0,1fr) auto}
+.pal-art{width:190px}
+.pal-art svg{width:100%;height:auto;display:block}
+.hand{fill:color-mix(in srgb,var(--teal) 30%,var(--surface));stroke:var(--teal-strong);stroke-width:2;stroke-linejoin:round}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.pal-card .event-icon{margin-bottom:12px}
+.pal-card h3{font-size:1.05rem;font-weight:800;margin-bottom:6px}
+.pal-card p{font-size:.92rem;color:var(--muted);line-height:1.7}
+.q-group{margin-top:14px;padding:14px 16px;background:var(--surface);border:1px solid var(--line);border-radius:14px;animation:rise .45s var(--ease) both}
+.q-group h4{font-size:.9rem;font-weight:800;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.q-group h4 .i{color:var(--teal-strong)}
+.q-group ol{padding-left:22px;display:grid;gap:6px;font-size:.9rem;line-height:1.55}
+
+/* =====================================================================
+   8. SOBREPOSIÇÕES — toasts, modal, barra inferior
+   ===================================================================== */
+.toasts{position:fixed;right:24px;bottom:24px;z-index:90;display:grid;gap:10px;justify-items:end;pointer-events:none}
+.toast{display:flex;align-items:center;gap:10px;max-width:380px;background:var(--navy);color:var(--surface);padding:13px 16px;border-radius:14px;box-shadow:var(--shadow-lg);font-size:.88rem;font-weight:600;animation:toastIn .35s var(--ease) both}
+.toast .t-ico{width:28px;height:28px;border-radius:9px;background:rgba(255,255,255,.14);display:grid;place-items:center;flex:none}
+.toast.out{animation:toastOut .3s ease both}
+@keyframes toastIn{from{opacity:0;transform:translateY(12px) scale(.97)}to{opacity:1;transform:none}}
+@keyframes toastOut{to{opacity:0;transform:translateY(8px)}}
+
+dialog.modal{border:0;padding:0;border-radius:var(--r-xl);background:var(--surface);color:var(--ink);width:min(560px,calc(100vw - 32px));max-height:calc(100vh - 48px);box-shadow:var(--shadow-lg)}
+dialog.modal[open]{animation:modalIn .35s var(--ease)}
+dialog.modal::backdrop{background:rgba(12,32,52,.42);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+@keyframes modalIn{from{opacity:0;transform:translateY(16px) scale(.98)}to{opacity:1;transform:none}}
+.modal-inner{padding:24px;overflow:auto;max-height:calc(100vh - 48px)}
+.modal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:16px}
+.modal-head h2{font-size:1.25rem;font-weight:800;margin-top:4px}
+.modal ul.tips{list-style:none;display:grid;gap:10px}
+.modal ul.tips li{display:flex;gap:10px;align-items:flex-start;font-size:.9rem;line-height:1.55;background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:11px 13px}
+.modal ul.tips .i{color:var(--teal-strong);margin-top:2px}
+.preview-sheet{position:relative;overflow:hidden;border:1px solid var(--line);border-radius:16px;background:var(--surface-2);padding:20px;min-height:260px}
+.preview-sheet .ph{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid var(--sky-2);padding-bottom:10px;margin-bottom:14px;font-size:.72rem;font-weight:800;letter-spacing:.14em;color:var(--blue-strong)}
+.preview-sheet .ln{height:10px;border-radius:6px;background:var(--line);margin:10px 0}
+.preview-sheet .watermark{position:absolute;inset:0;display:grid;place-items:center;font-size:3rem;font-weight:800;letter-spacing:.2em;color:color-mix(in srgb,var(--blue) 12%,transparent);transform:rotate(-18deg);pointer-events:none}
+.preview-img{height:150px;border-radius:12px;background:radial-gradient(circle at 40% 45%,color-mix(in srgb,var(--blue) 25%,transparent),transparent 40%),linear-gradient(135deg,var(--sky-2),var(--surface));margin-top:6px}
+
+.bottom-nav{display:none}
+
+/* =====================================================================
+   9. ALTO CONTRASTE — reforços de borda e sublinhado
+   ===================================================================== */
+[data-contrast="high"] .card,[data-contrast="high"] .team-card,[data-contrast="high"] .step-body,[data-contrast="high"] .hero,[data-contrast="high"] .welcome,[data-contrast="high"] .notice,[data-contrast="high"] .specialty,[data-contrast="high"] .r-section,[data-contrast="high"] .q-group{border-width:2px;border-color:var(--line-strong)}
+[data-contrast="high"] .field input,[data-contrast="high"] .field textarea,[data-contrast="high"] .field select,[data-contrast="high"] .search input{border-width:2px;border-color:var(--line-strong)}
+[data-contrast="high"] .btn-link{text-decoration:underline;text-underline-offset:3px}
+[data-contrast="high"] .welcome-art,[data-contrast="high"] .hero .lines{opacity:.5}
+[data-contrast="high"] .topbar::before{-webkit-backdrop-filter:none;backdrop-filter:none;border-bottom-width:2px;border-color:var(--line-strong)}
+[data-contrast="high"] :focus-visible{outline-width:4px;outline-color:var(--blue)}
+
+/* =====================================================================
+   9b. V4 — FUNÇÕES TRAZIDAS DA V3, NO VISUAL LIMPO DA V2
+   ===================================================================== */
+:root{--sos:#b93f33;--sos-soft:#fdebe8}
+[data-theme="dark"]{--sos:#ff9488;--sos-soft:#3a1d1a}
+[data-contrast="high"]{--sos:#8f1d12;--sos-soft:#fde9e6}
+[data-theme="dark"][data-contrast="high"]{--sos:#ffb1a8;--sos-soft:#2a0d0a}
+[hidden]{display:none!important}
+
+/* Efeito de toque e pequena celebração ao concluir */
+.btn-primary,.btn-soft,.chip{position:relative;overflow:hidden}
+.ripple{position:absolute;border-radius:50%;transform:scale(0);background:currentColor;opacity:.14;animation:rip .6s ease-out forwards;pointer-events:none}
+@keyframes rip{to{transform:scale(2.6);opacity:0}}
+.spark{position:fixed;width:8px;height:8px;margin:-4px 0 0 -4px;border-radius:50%;pointer-events:none;z-index:95;animation:fly .9s var(--ease) forwards}
+@keyframes fly{to{transform:translate(var(--dx),var(--dy)) scale(.3);opacity:0}}
+
+/* Barra superior: botões com texto */
+.pill-btn{position:relative;overflow:hidden;display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 15px;border-radius:14px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-weight:700;font-size:.88rem;transition:background .2s,border-color .2s,transform .2s var(--ease),box-shadow .2s;flex:none}
+.pill-btn:hover{border-color:var(--line-strong);transform:translateY(-1px);box-shadow:var(--shadow-sm)}
+.pill-btn[aria-pressed="true"],.pill-btn[aria-expanded="true"]{background:var(--sky);border-color:var(--blue);color:var(--navy)}
+.pill-btn.sos{background:var(--sos-soft);border-color:color-mix(in srgb,var(--sos) 35%,transparent);color:var(--sos)}
+.pill-btn.sos b{font-size:1rem;font-weight:800}
+.pill-btn.sos:hover{border-color:var(--sos)}
+.tools-wrap{position:relative}
+.tools-panel{display:none;position:absolute;right:0;top:calc(100% + 10px);z-index:70;width:320px;max-width:calc(100vw - 32px);flex-direction:column;align-items:stretch;gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow-lg);padding:12px}
+.tools-panel.open{display:flex;animation:rise .25s var(--ease)}
+.tp-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:6px 8px 12px;border-bottom:1px solid var(--line);margin-bottom:4px;font-weight:700;font-size:.9rem}
+.seg output{min-width:50px;text-align:center;font-weight:700;font-size:.85rem;font-variant-numeric:tabular-nums;color:var(--navy)}
+.switch-row{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;border:0;background:transparent;border-radius:14px;padding:10px 8px;text-align:left;font-weight:700;font-size:.92rem;color:var(--ink);transition:background .2s}
+.switch-row:hover{background:var(--sky)}
+.switch-row>span:first-child{display:flex;align-items:center;gap:12px}
+.switch-row>span:first-child .i{color:var(--blue)}
+.switch-row small{display:block;font-weight:400;font-size:.78rem;color:var(--muted)}
+.switch{width:46px;height:26px;border-radius:999px;background:var(--line-strong);position:relative;flex:none;transition:background .25s}
+.switch::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .25s var(--ease)}
+[aria-pressed="true"]>.switch{background:var(--teal)}
+[aria-pressed="true"]>.switch::after{transform:translateX(20px)}
+
+/* Atalhos */
+.quick{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin-bottom:16px}
+.q-tile{position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:flex-start;gap:4px;text-align:left;color:var(--ink);padding:18px 18px 20px;min-height:132px}
+.q-tile:hover{transform:translateY(-3px);box-shadow:var(--shadow-md);border-color:var(--line-strong)}
+.q-ico{width:48px;height:48px;flex:none;display:grid;place-items:center;border-radius:14px;background:var(--sky);color:var(--blue);margin-bottom:8px;transition:transform .3s var(--ease)}
+.q-ico .i{width:24px;height:24px}
+.q-tile:hover .q-ico{transform:scale(1.06)}
+.q-tile:nth-child(2) .q-ico{background:var(--teal-soft);color:var(--teal-strong)}
+.q-tile:nth-child(3) .q-ico{background:var(--gold-soft);color:var(--gold)}
+.q-tile b{font-size:1rem;color:var(--navy);line-height:1.3}
+.q-tile small{color:var(--muted);font-size:.84rem;line-height:1.4}
+.q-tile .go{position:absolute;right:18px;top:20px;color:var(--faint);transition:transform .3s var(--ease),color .3s}
+.q-tile:hover .go{transform:translateX(4px);color:var(--blue)}
+
+/* Diário de bem-estar e passos do dia */
+.today-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:22px;margin-top:22px}
+.ci-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:16px}
+.ci-head h3{font-size:1.1rem;font-weight:800;margin-top:4px}
+.faces{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+.face{position:relative;overflow:hidden;display:grid;justify-items:center;align-content:start;gap:6px;border:1.5px solid var(--line);background:var(--surface-2);border-radius:16px;padding:12px 4px 10px;font-size:.78rem;font-weight:700;line-height:1.2;text-align:center;color:var(--muted);transition:transform .25s var(--ease),border-color .25s,background .25s}
+.face svg{width:40px;height:40px}
+.face:hover{transform:translateY(-2px);border-color:var(--line-strong)}
+.face[aria-checked="true"]{border-color:var(--mood);background:color-mix(in srgb,var(--mood) 12%,var(--surface));color:var(--navy);animation:bounce .45s var(--ease)}
+@keyframes bounce{40%{transform:scale(1.06)}}
+.ci-extra{margin-top:16px;display:grid;gap:14px;animation:rise .4s var(--ease)}
+.week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px;align-items:end;height:104px;padding-top:8px;border-top:1px dashed var(--line-strong)}
+.week .bar{display:grid;justify-items:center;gap:5px;font-size:.74rem;color:var(--muted)}
+.week .bar i{display:block;width:100%;max-width:28px;border-radius:8px 8px 4px 4px;background:var(--c);height:calc(var(--v) * 14px + 10px);opacity:.85;transition:height .6s var(--ease)}
+.week .bar.today{color:var(--navy);font-weight:700}
+.week .bar.today i{opacity:1;outline:2px dashed var(--line-strong);outline-offset:2px}
+.week .bar.today.set i{outline:none;animation:rise .5s var(--ease)}
+.ring{position:relative;width:56px;height:56px;flex:none}
+.ring svg{width:56px;height:56px;transform:rotate(-90deg)}
+.ring circle{fill:none;stroke-width:6}
+.ring .bg{stroke:var(--sky)}
+.ring .fg{stroke:var(--teal);stroke-linecap:round;stroke-dasharray:150.8;stroke-dashoffset:150.8;transition:stroke-dashoffset .6s var(--ease)}
+.ring span{position:absolute;inset:0;display:grid;place-items:center;font-weight:800;font-size:.82rem;color:var(--navy);font-variant-numeric:tabular-nums}
+.todo{list-style:none;display:grid;gap:8px}
+.todo-item{position:relative;overflow:hidden;display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border:1.5px solid var(--line);border-radius:14px;background:var(--surface-2);cursor:pointer;transition:background .25s,border-color .25s;font-size:.92rem;line-height:1.45}
+.todo-item:hover{border-color:var(--line-strong)}
+.todo-item input{position:absolute;opacity:0;width:1px;height:1px}
+.todo-item .box{width:24px;height:24px;flex:none;border-radius:8px;border:2px solid var(--line-strong);display:grid;place-items:center;color:transparent;background:var(--surface);transition:all .25s var(--ease)}
+.todo-item .box .i{width:15px;height:15px;stroke-width:2.6}
+.todo-item:has(input:checked){background:var(--teal-soft);border-color:transparent}
+.todo-item:has(input:checked) .box{background:var(--teal);border-color:var(--teal);color:#fff}
+[data-theme="dark"] .todo-item:has(input:checked) .box{color:#062a27}
+.todo-item:has(input:checked) .t{text-decoration:line-through;text-decoration-color:var(--teal);color:var(--muted)}
+.todo-item:has(input:focus-visible){outline:3px solid var(--teal);outline-offset:2px}
+
+/* Boas-vindas */
+dialog.tour{width:min(580px,calc(100vw - 24px))}
+.tour .modal-inner{padding:26px 26px 22px}
+.tour-dots{display:flex;gap:6px;justify-content:center;margin-bottom:18px}
+.tour-dots i{width:8px;height:8px;border-radius:99px;background:var(--line-strong);transition:width .35s var(--ease),background .35s}
+.tour-dots i.on{width:26px;background:var(--blue)}
+.tour-step{animation:rise .4s var(--ease)}
+.tour h2{font-size:1.45rem;font-weight:800;text-align:center}
+.tour-step>p{text-align:center;color:var(--muted);margin:8px auto 18px;max-width:46ch}
+.tour-art{width:80px;height:80px;margin:0 auto 14px;display:grid;place-items:center;border-radius:24px;background:linear-gradient(145deg,var(--blue),var(--blue-strong));color:var(--on-primary);box-shadow:0 10px 22px rgba(40,125,183,.28)}
+.tour-art .i{width:38px;height:38px}
+.tour .tour-sample{font-size:1.08rem;color:var(--ink);background:var(--surface-2);border:1px dashed var(--line-strong);border-radius:16px;padding:16px;max-width:none}
+.tour-controls{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.btn-soft.big{min-height:50px;font-size:.98rem;padding:10px 18px}
+.tour .card-sub{text-align:center}
+.tour-foot{display:flex;justify-content:space-between;align-items:center;margin-top:22px;gap:10px}
+.tour-foot>div{display:flex;gap:8px}
+
+/* Emergência */
+.sos-number{font-size:4.5rem;font-weight:800;color:var(--sos);text-align:center;line-height:1;user-select:all;margin:4px 0 8px}
+.sos-call{display:flex;justify-content:center;margin:16px 0}
+.sos-link{text-decoration:none;background:var(--sos);font-size:1.05rem;min-height:54px;padding:12px 26px;box-shadow:0 8px 20px color-mix(in srgb,var(--sos) 30%,transparent)}
+[data-theme="dark"] .sos-link{color:#2a0905}
+
+/* Modo simples: maior, mais direto, sem enfeites e sem animações */
+[data-simple="on"] body{font-size:1.12rem}
+[data-simple="on"] .welcome-art,[data-simple="on"] .hero .lines{display:none}
+[data-simple="on"] .grid-main,[data-simple="on"] .bottom-grid,[data-simple="on"] .today-grid,[data-simple="on"] .two-col{grid-template-columns:minmax(0,1fr)}
+[data-simple="on"] .quick{grid-template-columns:repeat(2,minmax(0,1fr))}
+[data-simple="on"] .q-tile{min-height:150px}
+[data-simple="on"] .btn-primary{min-height:56px;font-size:1.05rem;padding:14px 26px}
+[data-simple="on"] *,[data-simple="on"] *::before,[data-simple="on"] *::after{animation:none!important}
+
+[data-contrast="high"] .face,[data-contrast="high"] .todo-item,[data-contrast="high"] .pill-btn{border-width:2px;border-color:var(--line-strong)}
+
+@media (max-width:1180px){
+  .quick{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .today-grid{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:640px){
+  .topbar{flex-wrap:wrap;row-gap:10px}
+  .title-wrap{flex:1 1 100%}
+  .tools{width:100%;justify-content:space-between;gap:6px}
+  .pill-btn{padding:0 12px}
+  .pill-btn .lbl,.sos-full{display:none}
+  .tools-wrap .tools-panel{position:fixed;left:16px;right:16px;top:136px;width:auto;max-width:none;flex-wrap:nowrap}
+  .faces{gap:5px}
+  .face{padding:10px 2px 8px;font-size:.68rem;border-radius:14px}
+  .face svg{width:32px;height:32px}
+  .q-tile{min-height:118px;padding:14px}
+  .q-tile .go{display:none}
+  .tour .modal-inner{padding:20px 16px 16px}
+  .tour h2{font-size:1.3rem}
+}
+
+/* =====================================================================
+   10. RESPONSIVO — gaveta lateral + barra inferior no celular
+   ===================================================================== */
+@media (max-width:1180px){
+  .app{grid-template-columns:252px minmax(0,1fr)}
+  .main{padding:0 26px 32px}
+  .topbar::before{inset:0 -26px}
+  .grid-main{grid-template-columns:minmax(0,1.2fr) minmax(0,1fr)}
+  .stat{flex-direction:column;align-items:flex-start;gap:10px}
+}
+@media (max-width:900px){
+  .app{display:block}
+  .sidebar{position:fixed;inset:0 auto 0 0;width:min(304px,86vw);height:100%;transform:translateX(-105%);transition:transform .32s var(--ease);box-shadow:var(--shadow-lg);visibility:hidden}
+  .sidebar.open{transform:none;visibility:visible}
+  .nav-btn[aria-current="page"]::before{display:none}
+  .scrim{display:block;position:fixed;inset:0;background:rgba(12,32,52,.4);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);z-index:55;opacity:0;pointer-events:none;transition:opacity .3s}
+  .scrim.show{opacity:1;pointer-events:auto}
+  .menu-btn{display:grid}
+  .main{padding:0 16px calc(100px + env(safe-area-inset-bottom))}
+  .topbar::before{inset:0 -16px}
+  .topbar{padding:12px 0}
+  .topbar h1{font-size:1.25rem}
+  .title-wrap .eyebrow{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:.64rem}
+  .tools .btn-primary{display:none}
+  .grid-main,.bottom-grid,.two-col{grid-template-columns:minmax(0,1fr)}
+  .right-stack{margin-top:0}
+  .welcome{grid-template-columns:minmax(0,1fr);padding:24px 22px}
+  .welcome-art{position:absolute;right:-30px;top:-20px;width:170px;opacity:.35}
+  .hero{padding:22px;grid-template-columns:minmax(0,1fr)}
+  .pal-hero{grid-template-columns:minmax(0,1fr)}
+  .pal-art{display:none}
+  .hero .lines{width:200px}
+  .toasts{left:16px;right:16px;bottom:calc(92px + env(safe-area-inset-bottom));justify-items:stretch}
+  .toast{max-width:none}
+  .bottom-nav{display:flex;position:fixed;left:12px;right:12px;bottom:calc(10px + env(safe-area-inset-bottom));z-index:50;background:var(--glass);-webkit-backdrop-filter:blur(18px) saturate(1.5);backdrop-filter:blur(18px) saturate(1.5);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow-lg);padding:6px}
+  .bottom-nav button{flex:1;display:grid;justify-items:center;gap:2px;border:0;background:transparent;color:var(--muted);font-size:.68rem;font-weight:700;padding:7px 2px;border-radius:16px;min-width:0;transition:background .2s,color .2s}
+  .bottom-nav button .i{width:22px;height:22px}
+  .bottom-nav button[aria-current="page"]{background:var(--sky);color:var(--navy)}
+  /* Jornada vertical: faixa paliativa vira trilho lateral que atravessa todas as fases */
+  .journey-board{grid-template-columns:minmax(0,1fr) 58px;gap:14px 18px;padding:18px}
+  .journey-board::before{top:40px;bottom:40px;left:44px;right:auto;width:3px;height:auto;background:linear-gradient(180deg,var(--sky-2),var(--blue))}
+  .step{grid-column:1;flex-direction:row;align-items:stretch;text-align:left;gap:12px}
+  .step-body{align-items:flex-start}
+  .band{grid-column:2;grid-row:1 / span 4;margin-top:0;flex-direction:column;padding:14px 6px;justify-content:center;gap:12px;background:linear-gradient(180deg,color-mix(in srgb,var(--teal) 10%,var(--surface)),color-mix(in srgb,var(--teal) 24%,var(--surface)),color-mix(in srgb,var(--teal) 10%,var(--surface)))}
+  .band .b-txt{writing-mode:vertical-rl;transform:rotate(180deg)}
+  .band .b-txt span{display:none}
+  .band .tag{margin:0;writing-mode:vertical-rl;transform:rotate(180deg);padding:10px 5px}
+  .band-ticks{left:-18px;right:auto;top:0;bottom:0;width:16px;height:auto;grid-template-columns:1fr;grid-template-rows:repeat(4,1fr)}
+  .band-ticks i{justify-self:start;align-self:center;width:16px;height:2px}
+  .band-ticks i::after{left:-4px;top:50%;margin:-4px 0 0}
+}
+@media (max-width:640px){
+  .a11y-toggle{display:grid}
+  .tools-panel{display:none;position:absolute;right:0;top:calc(100% + 6px);background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow-lg);padding:10px;flex-wrap:wrap;width:max-content;max-width:calc(100vw - 32px)}
+  .tools-panel.open{display:flex;animation:rise .25s var(--ease)}
+  .stats{grid-template-columns:minmax(0,1fr);gap:10px}
+  .stat{flex-direction:row;align-items:center;padding:16px}
+  .stat strong{font-size:1.8rem}
+  .form-grid,.topics,.team-grid,.jd-grid,.specialties{grid-template-columns:minmax(0,1fr)}
+  .timeline{padding:4px 16px}
+  .event-btn{grid-template-columns:40px minmax(0,1fr) 22px;gap:12px}
+  .event-btn time,.event-btn .tag{grid-column:2;grid-row:2;justify-self:start}
+  .event-btn .chev{grid-column:3;grid-row:1}
+  .event-detail{padding-left:0}
+  .event:not(:last-child)::before{display:none}
+  .card{padding:18px}
+  .team-role{padding-left:16px}
+  .doc-row{flex-wrap:wrap}
+  .doc-row .tag{display:none}
+  .status-track li+li::before{margin:0 8px}
+  .actions .btn-primary{width:100%}
+}
+
+/* Respeito a prefers-reduced-motion */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-delay:0ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+}
+</style>
+<script src="js/config.js"></script>
+<!-- PORTA (Fase 3): a página só aparece depois de confirmar o login. A fechadura é o RLS no banco. -->
+<style>html:not(.cuidar-liberado) body{visibility:hidden}</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="js/supabase-cliente.js"></script>
+<script src="js/protecao.js"></script>
+</head>
+<body>
+
+<!-- =====================================================================
+     ÍCONES SVG (sprite inline) — substituem os símbolos unicode da v1
+     ===================================================================== -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20h14V9.5"/><path d="M10 20v-5h4v5"/></symbol>
+  <symbol id="i-history" viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="2.5"/><path d="M9 4V2.8h6V4"/><path d="M9 10h6M9 14h6M9 18h3"/></symbol>
+  <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 7.5A2.5 2.5 0 0 1 5.5 5H9l2 2h7.5A2.5 2.5 0 0 1 21 9.5v8a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 3 17.5z"/></symbol>
+  <symbol id="i-route" viewBox="0 0 24 24"><circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="6" r="2.5"/><path d="M8.5 18H15a3 3 0 0 0 0-6H9a3 3 0 0 1 0-6h6.5"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7"/><path d="M18 14.5a6.5 6.5 0 0 1 3.5 5.5"/></symbol>
+  <symbol id="i-sparkles" viewBox="0 0 24 24"><path d="M11 3l1.8 4.7 4.7 1.8-4.7 1.8L11 16l-1.8-4.7L4.5 9.5l4.7-1.8z"/><path d="M18.5 14.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z"/></symbol>
+  <symbol id="i-notes" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2.5"/><path d="M8 8h8M8 12h8M8 16h5"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20s-7.5-4.6-9.2-9.4C1.6 7.2 3.9 4 7.2 4c2 0 3.6 1.1 4.8 2.8C13.2 5.1 14.8 4 16.8 4c3.3 0 5.6 3.2 4.4 6.6C19.5 15.4 12 20 12 20z"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 16v-5a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/></symbol>
+  <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 15V4M7 9l5-5 5 5"/><path d="M4 15v3.5A2.5 2.5 0 0 0 6.5 21h11a2.5 2.5 0 0 0 2.5-2.5V15"/></symbol>
+  <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h10"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></symbol>
+  <symbol id="i-contrast" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 3.5v17a8.5 8.5 0 0 0 0-17z" fill="currentColor"/></symbol>
+  <symbol id="i-type" viewBox="0 0 24 24"><path d="M4 19 9 5l5 14M5.8 14h6.4"/><path d="M16 19l2.5-7 2.5 7M16.8 17h3.4"/></symbol>
+  <symbol id="i-stetho" viewBox="0 0 24 24"><path d="M6 3v5a4 4 0 0 0 8 0V3"/><path d="M10 12v2a5 5 0 0 0 10 0v-1"/><circle cx="20" cy="11" r="2"/></symbol>
+  <symbol id="i-flask" viewBox="0 0 24 24"><path d="M9 3h6M10 3v6L4.8 18a2 2 0 0 0 1.7 3h11a2 2 0 0 0 1.7-3L14 9V3"/><path d="M7.5 14h9"/></symbol>
+  <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 3H7a2.5 2.5 0 0 0-2.5 2.5v13A2.5 2.5 0 0 0 7 21h10a2.5 2.5 0 0 0 2.5-2.5V8.5z"/><path d="M14 3v5.5h5.5M9 13h6M9 17h4"/></symbol>
+  <symbol id="i-image" viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="15" rx="2.5"/><circle cx="9" cy="10" r="1.8"/><path d="m20.5 16-5-5L6 19.5"/></symbol>
+  <symbol id="i-apple" viewBox="0 0 24 24"><path d="M12 7.5c-1.6-1-5-1.4-6.5 1.4S5 16 7 19s3.5 2 5 1.3c1.5.7 3 1.7 5-1.3s3-7.3 1.5-10.1S13.6 6.5 12 7.5z"/><path d="M12 7.5c0-2 1-3.5 3-4.3"/></symbol>
+  <symbol id="i-brain" viewBox="0 0 24 24"><path d="M9 4a3 3 0 0 0-3 3 3 3 0 0 0-2 5 3 3 0 0 0 2 5 3 3 0 0 0 3 3 3 3 0 0 0 3-3V7a3 3 0 0 0-3-3z"/><path d="M15 4a3 3 0 0 1 3 3 3 3 0 0 1 2 5 3 3 0 0 1-2 5 3 3 0 0 1-3 3 3 3 0 0 1-3-3"/></symbol>
+  <symbol id="i-hospital" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="17" rx="2"/><path d="M12 8v6M9 11h6M9.5 21v-3h5v3"/></symbol>
+  <symbol id="i-arrow-ur" viewBox="0 0 24 24"><path d="M7 17 17 7M9 7h8v8"/></symbol>
+  <symbol id="i-arrow-r" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+  <symbol id="i-sprout" viewBox="0 0 24 24"><path d="M12 21v-9"/><path d="M12 12c0-4-3-6-7-6 0 4 3 6 7 6z"/><path d="M12 10c0-3.5 2.5-6 7-6 0 4-3 6-7 6z"/></symbol>
+  <symbol id="i-hands" viewBox="0 0 24 24"><path d="M12 11.5s-3.5-2.1-3.5-4.4A1.9 1.9 0 0 1 12 6a1.9 1.9 0 0 1 3.5 1.1c0 2.3-3.5 4.4-3.5 4.4z"/><path d="M3 15h3l3.5 2H14a1.5 1.5 0 0 0 0-3h-3"/><path d="M14 16l4.5-2.2a1.6 1.6 0 0 1 1.8 2.6L15 20.5H8L3 19"/></symbol>
+  <symbol id="i-tooth" viewBox="0 0 24 24"><path d="M7.5 3.5c-2.5 0-4 2-4 4.5 0 2.5 1.2 4 1.7 6.5.5 2.7 1 6 2.6 6s1.7-4 2.2-5.5c.4-1 1.6-1 2 0 .5 1.5.6 5.5 2.2 5.5s2.1-3.3 2.6-6c.5-2.5 1.7-4 1.7-6.5 0-2.5-1.5-4.5-4-4.5-1.8 0-2.6 1-4.5 1s-2.7-1-4.5-1z"/></symbol>
+  <symbol id="i-ribbon" viewBox="0 0 24 24"><path d="M12 3a3.5 3.5 0 0 0-3.5 3.5c0 2.5 2 5 3.5 7 1.5-2 3.5-4.5 3.5-7A3.5 3.5 0 0 0 12 3z"/><path d="M10 11.5 5.5 20l3-.5 1.5 2.5 3-6M14 11.5l4.5 8.5-3-.5-1.5 2.5-3-6"/></symbol>
+  <symbol id="i-cross" viewBox="0 0 24 24"><path d="M9.5 3.5h5v6h6v5h-6v6h-5v-6h-6v-5h6z"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7.6v.4"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 3.5 2.5 20h19z"/><path d="M12 10v4.5M12 17.4v.3"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24"><path d="M5 3.5h3.5l1.5 4.5-2 1.5a12 12 0 0 0 6.5 6.5l1.5-2 4.5 1.5V19a2 2 0 0 1-2 2A16.5 16.5 0 0 1 3 5.5a2 2 0 0 1 2-2z"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24"><path d="M21 3 10 14"/><path d="M21 3l-7 18-4-7-7-4z"/></symbol>
+  <symbol id="i-chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+  <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .9-1 1.7v.5M12 17v.3"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 4.5 6v6c0 4.5 3.2 7.8 7.5 9 4.3-1.2 7.5-4.5 7.5-9V6z"/><path d="m9 12 2 2 4-4"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></symbol>
+  <symbol id="i-pill" viewBox="0 0 24 24"><path d="M10.5 20.5a5 5 0 0 1-7-7l6-6a5 5 0 0 1 7 7z"/><path d="m7 10 7 7"/></symbol>
+  <symbol id="i-leaf" viewBox="0 0 24 24"><path d="M5 19C5 11 10 5 20 5c0 10-6 15-14 15"/><path d="M5 19c3-4 6-6 10-8"/></symbol>
+  <symbol id="i-question" viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v9a2.5 2.5 0 0 1-2.5 2.5H11l-4.5 4v-4A2.5 2.5 0 0 1 4 14.5z"/><path d="M10 8.5a2 2 0 1 1 2.6 1.9c-.4.2-.6.5-.6 1v.3M12 13.6v.2"/></symbol>
+  <symbol id="i-list" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1"/><circle cx="4.5" cy="12" r="1"/><circle cx="4.5" cy="18" r="1"/></symbol>
+  <symbol id="i-dots" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="19" cy="12" r="1.4"/></symbol>
+  <!-- ícones trazidos da v3 -->
+  <symbol id="i-volume" viewBox="0 0 24 24"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/></symbol>
+  <symbol id="i-stop" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="3"/></symbol>
+  <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2.2"/><circle cx="10" cy="17" r="2.2"/></symbol>
+  <symbol id="i-simple" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="7" height="7" rx="2.2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2.2"/><rect x="3.5" y="13.5" width="17" height="7" rx="2.2"/></symbol>
+</svg>
+
+<a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+
+<div class="app">
+<!-- =====================================================================
+     BARRA LATERAL (vira gaveta deslizante no celular)
+     ===================================================================== -->
+<aside class="sidebar" id="sidebar" aria-label="Menu principal">
+  <div class="brand">
+    <svg viewBox="0 0 44 44" aria-hidden="true"><defs><linearGradient id="lgBrand" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#62b6d8"/><stop offset="1" stop-color="#287db7"/></linearGradient></defs><rect width="44" height="44" rx="14" fill="url(#lgBrand)"/><path d="M22 33s-10-6-10-12.6A5 5 0 0 1 22 17.2a5 5 0 0 1 10 3.2C32 27 22 33 22 33z" fill="#fff"/><path d="M22 20.8v6.4M18.8 24h6.4" stroke="#287db7" stroke-width="2.4" stroke-linecap="round"/></svg>
+    <div><strong>CUIDAR</strong><small>JORNADA INTEGRADA</small></div>
+  </div>
+
+  <div>
+    <p class="nav-label" id="nav1">Meu espaço</p>
+    <nav class="nav" aria-labelledby="nav1">
+      <button class="nav-btn" data-page="inicio"><span class="ico"><svg class="i"><use href="#i-home"/></svg></span> Visão geral</button>
+      <button class="nav-btn" data-page="historico"><span class="ico"><svg class="i"><use href="#i-history"/></svg></span> Histórico de saúde</button>
+      <button class="nav-btn" data-page="documentos"><span class="ico"><svg class="i"><use href="#i-folder"/></svg></span> Documentos e exames</button>
+      <button class="nav-btn" data-page="jornada"><span class="ico"><svg class="i"><use href="#i-route"/></svg></span> Minha jornada</button>
+      <button class="nav-btn" data-page="equipe"><span class="ico"><svg class="i"><use href="#i-users"/></svg></span> Equipe de cuidado</button>
+    </nav>
+  </div>
+
+  <div>
+    <p class="nav-label" id="nav2">Apoio e informação</p>
+    <nav class="nav" aria-labelledby="nav2">
+      <button class="nav-btn" data-page="tradutor"><span class="ico"><svg class="i"><use href="#i-sparkles"/></svg></span> Tradutor da Saúde</button>
+      <button class="nav-btn" data-page="consulta"><span class="ico"><svg class="i"><use href="#i-notes"/></svg></span> Depois da consulta</button>
+      <button class="nav-btn" data-page="paliativos"><span class="ico"><svg class="i"><use href="#i-heart"/></svg></span> Cuidado paliativo</button>
+    </nav>
+  </div>
+
+  <div class="sidebar-bottom">
+    <div class="help-card">
+      <div class="help-ico"><svg class="i"><use href="#i-help"/></svg></div>
+      <b>Precisa de ajuda?</b>
+      <p>Estamos aqui para facilitar sua jornada. Encontre orientações sobre como usar o CUIDAR.</p>
+      <button class="btn-soft" id="helpBtn" type="button">Acessar ajuda <svg class="i"><use href="#i-arrow-r"/></svg></button>
+    </div>
+    <div class="profile"><div class="avatar" aria-hidden="true">MS</div><div><b>Maria Silva</b><small>Paciente · Perfil demonstrativo</small></div></div>
+  </div>
+</aside>
+<div class="scrim" id="scrim" aria-hidden="true"></div>
+
+<main class="main" id="conteudo">
+<!-- =====================================================================
+     TOPBAR (glassmorphism) + controles de acessibilidade
+     ===================================================================== -->
+<header class="topbar">
+  <div class="title-wrap">
+    <button class="icon-btn menu-btn" id="menuBtn" type="button" aria-label="Abrir menu" aria-controls="sidebar" aria-expanded="false"><svg class="i"><use href="#i-menu"/></svg></button>
+    <div style="min-width:0">
+      <div class="eyebrow">Sua saúde, mais conectada</div>
+      <h1 id="pageTitle" tabindex="-1">Visão geral</h1>
+    </div>
+  </div>
+  <div class="tools">
+    <button class="pill-btn sos" type="button" id="sosBtn" aria-label="Emergência: ver como ligar para o SAMU, 192"><svg class="i"><use href="#i-phone"/></svg><span class="sos-full">Emergência</span><b>192</b></button>
+    <button class="pill-btn" type="button" id="speakBtn" aria-pressed="false" aria-label="Ouvir esta página em voz alta"><svg class="i"><use href="#i-volume"/></svg><span class="lbl">Ouvir</span></button>
+    <div class="tools-wrap">
+      <button class="pill-btn" type="button" id="a11yToggle" aria-expanded="false" aria-controls="toolsPanel"><svg class="i"><use href="#i-sliders"/></svg><span class="lbl">Ajustes</span><span class="sr-only"> de leitura e aparência</span></button>
+      <div class="tools-panel" id="toolsPanel" role="group" aria-label="Ajustes de leitura e aparência">
+        <div class="tp-row"><span>Tamanho do texto</span>
+          <div class="seg" role="group" aria-label="Tamanho do texto">
+            <button type="button" id="fontDown" aria-label="Diminuir o tamanho do texto">A−</button>
+            <output id="scaleOut" aria-live="polite">100%</output>
+            <button type="button" id="fontUp" aria-label="Aumentar o tamanho do texto">A+</button>
+          </div>
+        </div>
+        <button class="switch-row" id="contrastBtn" type="button" aria-pressed="false"><span><svg class="i"><use href="#i-contrast"/></svg><span>Alto contraste<small>Cores mais fortes</small></span></span><span class="switch" aria-hidden="true"></span></button>
+        <button class="switch-row" id="themeBtn" type="button" aria-pressed="false"><span><svg class="i"><use href="#i-moon"/></svg><span>Modo escuro<small>Mais confortável à noite</small></span></span><span class="switch" aria-hidden="true"></span></button>
+        <button class="switch-row" id="simpleBtn" type="button" aria-pressed="false"><span><svg class="i"><use href="#i-simple"/></svg><span>Modo simples<small>Botões maiores e menos enfeites</small></span></span><span class="switch" aria-hidden="true"></span></button>
+        <button class="btn-soft" id="tourBtn" type="button" style="margin-top:6px;justify-content:center"><svg class="i"><use href="#i-help"/></svg> Rever as boas-vindas</button>
+      </div>
+    </div>
+    <button class="icon-btn" type="button" aria-label="Notificações" data-toast="Você não tem novas notificações"><svg class="i"><use href="#i-bell"/></svg><i class="dot" aria-hidden="true"></i></button>
+    <button class="btn-primary" type="button" data-go="documentos"><svg class="i"><use href="#i-plus"/></svg> Adicionar documento</button>
+  </div>
+</header>
+
+<!-- =====================================================================
+     TELA 1 — VISÃO GERAL
+     ===================================================================== -->
+<section class="page" id="inicio" aria-labelledby="pageTitle">
+  <div class="welcome reveal">
+    <div>
+      <div class="eyebrow">Olá, Maria 👋</div>
+      <h2>Seu cuidado merece estar conectado.</h2>
+      <p>Reunimos suas informações, compromissos e orientações em um só lugar para facilitar sua jornada de saúde.</p>
+      <div class="date-chip"><svg class="i"><use href="#i-clock"/></svg> Sábado, 7 de novembro de 2026</div>
+    </div>
+    <!-- Ilustração original: fígado estilizado com linha de cuidado -->
+    <div class="welcome-art" aria-hidden="true">
+      <svg viewBox="0 0 280 210">
+        <defs>
+          <linearGradient id="lgLiver" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:#7cc6e2"/><stop offset=".55" style="stop-color:#3d93c6"/><stop offset="1" style="stop-color:#2c7a93"/></linearGradient>
+          <linearGradient id="lgGb" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:#7fd0c9"/><stop offset="1" style="stop-color:#43a6a0"/></linearGradient>
+        </defs>
+        <circle class="art-ring" cx="146" cy="104" r="96"/>
+        <circle class="art-ring dash" cx="146" cy="104" r="76"/>
+        <path d="M44 96C44 62 86 44 136 46c44 2 90 6 106 28 10 14-2 30-24 38-30 12-58 32-84 52-18 14-42 8-60-10C56 136 44 120 44 96z" fill="url(#lgLiver)"/>
+        <path d="M58 92c10-22 38-34 70-36" class="art-white" opacity=".6"/>
+        <path d="M132 50c-6 34-4 74 2 112" class="art-white" opacity=".45"/>
+        <ellipse cx="156" cy="134" rx="11" ry="17" transform="rotate(-24 156 134)" fill="url(#lgGb)"/>
+        <path class="art-pulse" d="M14 108h66l10-20 14 42 12-32 8 10h40l8-14 8 14h86"/>
+        <circle class="art-dot" cx="240" cy="40" r="5"/>
+        <circle class="art-dot b" cx="34" cy="160" r="4"/>
+        <circle class="art-dot" cx="60" cy="40" r="3"/>
+        <path class="art-heart" d="M222 176s-11-6.6-11-13.4a5.5 5.5 0 0 1 11-1.6 5.5 5.5 0 0 1 11 1.6c0 6.8-11 13.4-11 13.4z"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Atalhos (trazidos da v3) -->
+  <h2 class="sr-only">Atalhos</h2>
+  <div class="quick">
+    <button class="q-tile card reveal" type="button" data-go="documentos"><span class="q-ico"><svg class="i"><use href="#i-folder"/></svg></span><b>Ver meus documentos</b><small>Exames, laudos e imagens</small><svg class="i go"><use href="#i-arrow-r"/></svg></button>
+    <button class="q-tile card reveal" type="button" data-go="tradutor"><span class="q-ico"><svg class="i"><use href="#i-sparkles"/></svg></span><b>Entender um exame</b><small>Explicação em palavras simples</small><svg class="i go"><use href="#i-arrow-r"/></svg></button>
+    <button class="q-tile card reveal" type="button" data-go="consulta"><span class="q-ico"><svg class="i"><use href="#i-notes"/></svg></span><b>Anotar a consulta</b><small>Organizar o que foi conversado</small><svg class="i go"><use href="#i-arrow-r"/></svg></button>
+    <button class="q-tile card reveal" type="button" data-go="equipe"><span class="q-ico"><svg class="i"><use href="#i-users"/></svg></span><b>Falar com a equipe</b><small>Pedir contato do serviço</small><svg class="i go"><use href="#i-arrow-r"/></svg></button>
+  </div>
+
+  <div class="stats">
+    <div class="card stat lift reveal"><div class="stat-icon"><svg class="i"><use href="#i-folder"/></svg></div><div><div class="stat-label">Documentos organizados</div><strong><span data-count="18" data-pad="2" aria-hidden="true">18</span><span class="sr-only">18</span></strong><small>Em seu histórico de saúde</small></div></div>
+    <div class="card stat lift reveal"><div class="stat-icon"><svg class="i"><use href="#i-calendar"/></svg></div><div><div class="stat-label">Próximos compromissos</div><strong><span data-count="2" data-pad="2" aria-hidden="true">02</span><span class="sr-only">02</span></strong><small>Consultas e exames</small></div></div>
+    <div class="card stat lift reveal"><div class="stat-icon"><svg class="i"><use href="#i-users"/></svg></div><div><div class="stat-label">Equipe de cuidado</div><strong><span data-count="6" data-pad="2" aria-hidden="true">06</span><span class="sr-only">06</span></strong><small>Especialidades registradas</small></div></div>
+  </div>
+
+  <!-- Diário de bem-estar e Pequenos passos de hoje (trazidos da v3) -->
+  <div class="today-grid">
+    <div class="card checkin reveal">
+      <div class="ci-head"><div><div class="eyebrow">Diário de bem-estar · exemplo</div><h3 id="ciTitle">Como você está hoje?</h3></div><span class="tag ghost">Não é salvo</span></div>
+      <div class="faces" id="faces" role="radiogroup" aria-labelledby="ciTitle"></div>
+      <div class="ci-extra" id="ciExtra" hidden>
+        <div><p style="margin:0 0 8px;font-weight:700;font-size:.9rem">Quer marcar algo? <span style="font-weight:400;color:var(--muted)">(opcional)</span></p><div class="chips" id="symChips" role="group" aria-label="Sinais para marcar"></div></div>
+        <div><p class="card-sub" style="margin:0 0 4px">Últimos 7 dias (exemplo) e hoje</p><div class="week" id="week"></div></div>
+        <p class="notice alert" id="ciAlert" hidden><svg class="i"><use href="#i-phone"/></svg><span>Se o que você sente é novo, forte ou piorou, fale com a equipe. Em emergência, ligue para o <b>SAMU (192)</b>.</span></p>
+        <div class="actions"><button class="btn-soft" type="button" id="ciToNotes"><svg class="i"><use href="#i-notes"/></svg> Levar para a próxima consulta</button></div>
+      </div>
+    </div>
+
+    <div class="card today reveal">
+      <div class="ci-head"><div><div class="eyebrow">Hoje · sábado, 7 nov</div><h3>Pequenos passos de hoje</h3></div>
+        <div class="ring" aria-hidden="true"><svg viewBox="0 0 58 58"><circle class="bg" cx="29" cy="29" r="24"/><circle class="fg" id="ringFg" cx="29" cy="29" r="24"/></svg><span id="ringTxt">0/4</span></div></div>
+      <ul class="todo">
+        <li><label class="todo-item"><input type="checkbox" id="td1"><span class="box"><svg class="i"><use href="#i-check"/></svg></span><span class="t">Separar os exames recentes para a consulta de 12/nov</span></label></li>
+        <li><label class="todo-item"><input type="checkbox" id="td2"><span class="box"><svg class="i"><use href="#i-check"/></svg></span><span class="t">Anotar as dúvidas para levar à hepatologia</span></label></li>
+        <li><label class="todo-item"><input type="checkbox" id="td3"><span class="box"><svg class="i"><use href="#i-check"/></svg></span><span class="t">Combinar como chegar ao hospital no dia 12</span></label></li>
+        <li><label class="todo-item"><input type="checkbox" id="td4"><span class="box"><svg class="i"><use href="#i-check"/></svg></span><span class="t">Reservar um momento de descanso ou de algo que faça bem</span></label></li>
+      </ul>
+      <p class="card-sub" style="margin-top:12px">Lista de exemplo para organizar o dia. Os cuidados de saúde são definidos com a equipe.</p>
+    </div>
+  </div>
+
+  <div class="grid-main">
+    <div class="reveal">
+      <div class="section-head"><h3>Linha do tempo da saúde</h3><button class="btn-link" type="button" data-go="historico">Ver histórico completo <svg class="i"><use href="#i-arrow-r"/></svg></button></div>
+      <ul class="card timeline">
+        <li class="event" data-expand>
+          <button class="event-btn" type="button" aria-expanded="false" aria-controls="ev-o1"><span class="event-icon"><svg class="i"><use href="#i-stetho"/></svg></span><span><span class="event-title">Consulta com hepatologista</span><span class="event-desc">Retorno e acompanhamento clínico · Hospital de referência</span></span><time datetime="2026-11-12">12 nov</time><svg class="i chev"><use href="#i-chev"/></svg></button>
+          <div class="collapse" id="ev-o1" inert><div><div class="event-detail"><div class="box">Compromisso agendado para as 09:30, no ambulatório. Leve seus documentos recentes e as dúvidas organizadas em “Depois da consulta”.<div class="meta"><span class="tag blue">Agendado</span><span class="tag ghost">Registro fictício</span></div></div></div></div></div>
+        </li>
+        <li class="event" data-expand>
+          <button class="event-btn" type="button" aria-expanded="false" aria-controls="ev-o2"><span class="event-icon teal"><svg class="i"><use href="#i-flask"/></svg></span><span><span class="event-title">Exames laboratoriais</span><span class="event-desc">Resultados anexados ao histórico de saúde</span></span><time datetime="2026-11-04">04 nov</time><svg class="i chev"><use href="#i-chev"/></svg></button>
+          <div class="collapse" id="ev-o2" inert><div><div class="event-detail"><div class="box">Hemograma completo anexado em “Documentos e exames”. Os resultados são interpretados pela equipe na consulta de retorno.<div class="meta"><span class="tag">Anexado</span><span class="tag ghost">Registro fictício</span></div></div></div></div></div>
+        </li>
+        <li class="event" data-expand>
+          <button class="event-btn" type="button" aria-expanded="false" aria-controls="ev-o3"><span class="event-icon"><svg class="i"><use href="#i-file"/></svg></span><span><span class="event-title">Relatório médico adicionado</span><span class="event-desc">Documento recebido de outro serviço de saúde</span></span><time datetime="2026-10-28">28 out</time><svg class="i chev"><use href="#i-chev"/></svg></button>
+          <div class="collapse" id="ev-o3" inert><div><div class="event-detail"><div class="box">Relatório de acompanhamento enviado por outro serviço. Com ele no histórico, a nova equipe não precisa reconstruir o caso do zero.<div class="meta"><span class="tag blue">Outro serviço</span><span class="tag ghost">Registro fictício</span></div></div></div></div></div>
+        </li>
+        <li class="event" data-expand>
+          <button class="event-btn" type="button" aria-expanded="false" aria-controls="ev-o4"><span class="event-icon gold"><svg class="i"><use href="#i-apple"/></svg></span><span><span class="event-title">Acompanhamento nutricional</span><span class="event-desc">Orientações alimentares registradas</span></span><time datetime="2026-10-21">21 out</time><svg class="i chev"><use href="#i-chev"/></svg></button>
+          <div class="collapse" id="ev-o4" inert><div><div class="event-detail"><div class="box">As orientações foram registradas como apoio à memória. Qualquer ajuste deve ser confirmado com a nutricionista.<div class="meta"><span class="tag gold">Orientação</span><span class="tag ghost">Registro fictício</span></div></div></div></div></div>
+        </li>
+      </ul>
+    </div>
+
+    <div class="right-stack">
+      <div class="card appt reveal">
+        <div class="appt-muted">PRÓXIMO COMPROMISSO</div>
+        <h3>Consulta · Hepatologia</h3>
+        <div class="appt-meta"><span><svg class="i"><use href="#i-calendar"/></svg> 12 de novembro</span><span><svg class="i"><use href="#i-clock"/></svg> 09:30</span></div>
+        <div class="place">Hospital de referência · Ambulatório</div>
+        <button class="btn-light" type="button" id="apptBtn">Ver orientações <svg class="i"><use href="#i-arrow-r"/></svg></button>
+      </div>
+      <div class="reveal">
+        <div class="section-head" style="margin:0 0 12px"><h3>Minha equipe de cuidado</h3><button class="btn-link" type="button" data-go="equipe">Ver equipe <svg class="i"><use href="#i-arrow-r"/></svg></button></div>
+        <div class="card specialties">
+          <div class="specialty"><span class="s-ico"><svg class="i"><use href="#i-stetho"/></svg></span><div><b>Hepatologia</b><small>Equipe médica</small></div></div>
+          <div class="specialty"><span class="s-ico"><svg class="i"><use href="#i-brain"/></svg></span><div><b>Psicologia</b><small>Saúde emocional</small></div></div>
+          <div class="specialty"><span class="s-ico"><svg class="i"><use href="#i-apple"/></svg></span><div><b>Nutrição</b><small>Alimentação</small></div></div>
+          <div class="specialty"><span class="s-ico"><svg class="i"><use href="#i-heart"/></svg></span><div><b>Cuidados paliativos</b><small>Qualidade de vida</small></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bottom-grid">
+    <div class="reveal">
+      <div class="section-head"><h3>Documentos recentes</h3><button class="btn-link" type="button" data-go="documentos">Ver todos <svg class="i"><use href="#i-arrow-r"/></svg></button></div>
+      <ul class="card doc-list" style="padding:8px 22px">
+        <li class="doc-row"><span class="doc-ext" aria-hidden="true">PDF</span><div class="doc-info"><b>Hemograma completo</b><small>Exame laboratorial · 04 nov 2026</small></div><button class="btn-link" type="button" data-preview="0"><svg class="i"><use href="#i-eye"/></svg> Visualizar</button></li>
+        <li class="doc-row"><span class="doc-ext" aria-hidden="true">PDF</span><div class="doc-info"><b>Relatório de acompanhamento</b><small>Relatório médico · 28 out 2026</small></div><button class="btn-link" type="button" data-preview="2"><svg class="i"><use href="#i-eye"/></svg> Visualizar</button></li>
+        <li class="doc-row"><span class="doc-ext img" aria-hidden="true">IMG</span><div class="doc-info"><b>Imagem de exame</b><small>Imagem anexada · 15 out 2026</small></div><button class="btn-link" type="button" data-preview="3"><svg class="i"><use href="#i-eye"/></svg> Visualizar</button></li>
+      </ul>
+    </div>
+    <div class="reveal">
+      <div class="section-head"><h3>Uma jornada, muitos cuidados</h3></div>
+      <div class="card">
+        <div class="journey-head"><b>Organização da jornada</b><span class="tag ghost">Exemplo ilustrativo</span></div>
+        <div class="progress" role="progressbar" aria-label="Organização da jornada (exemplo)" aria-valuenow="72" aria-valuemin="0" aria-valuemax="100"><span></span></div>
+        <div class="progress-meta"><span>Informações pessoais e documentos reunidos</span><b>72%</b></div>
+        <div class="care-note"><div class="round"><svg class="i"><use href="#i-heart"/></svg></div><div><b>Cuidar também é acolher</b><p>Cuidados paliativos podem ser oferecidos em diferentes momentos da doença, junto a outros tratamentos, para apoiar qualidade de vida e aliviar o sofrimento.</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =====================================================================
+     TELA 2 — HISTÓRICO DE SAÚDE
+     ===================================================================== -->
+<section class="page feature-page" id="historico" aria-labelledby="pageTitle">
+  <div class="hero reveal">
+    <div class="hero-ico"><svg class="i"><use href="#i-history"/></svg></div>
+    <div><div class="eyebrow">Informação organizada</div><h2>Histórico de saúde</h2><p>Uma visão cronológica das informações que você ou sua equipe registraram. O histórico ajuda a levar o contexto da sua saúde para diferentes serviços de atendimento.</p></div>
+    <svg class="lines" viewBox="0 0 300 120" aria-hidden="true"><path d="M0 90c40-30 80 20 120-10s80-40 180 0"/><path class="t" d="M0 105c50-25 90 15 140-10s90-30 160 5"/><path d="M20 60c40-20 70 10 110-8s80-30 170 2"/></svg>
+  </div>
+  <p class="card-sub reveal" style="margin:0 0 10px">Toque em um registro para ver os detalhes.</p>
+  <ul class="card timeline reveal">
+    <li class="event" data-expand>
+      <button class="event-btn" type="button" aria-expanded="false" aria-controls="ev-h1"><span class="event-icon"><svg class="i"><use href="#i-hospital"/></svg></span><span><span class="event-title">Atendimento em serviço de saúde municipal</span><span class="event-desc">Início do acompanhamento · Documentos e exames anexados pelo paciente</span></span><span class="tag blue">2025</span><svg class="i chev"><use href="#i-chev"/></svg></button>
+      <div class="collapse" id="ev-h1" inert><div><div class="event-detail"><div class="box">Primeiros atendimentos na unidade de saúde do município. Os exames e documentos desta fase foram reunidos pela própria paciente.<div class="meta"><span class="tag gold">Autorrelato</span><span class="tag ghost">Validar com a equipe</span></div></div></div></div></div>
+    </li>
+    <li class="event" data-expand>
+      <button class="event-btn" type="button" aria-expanded="false" aria-controls="ev-h2"><span class="event-icon teal"><svg class="i"><use href="#i-arrow-ur"/></svg></span><span><span class="event-title">Encaminhamento para serviço especializado</span><span class="event-desc">Transição entre serviços · Histórico anterior reunido</span></span><span class="tag">2026</span><svg class="i chev"><use href="#i-chev"/></svg></button>
+      <div class="collapse" id="ev-h2" inert><div><div class="event-detail"><div class="box">Encaminhamento para um serviço especializado em outra cidade. O histórico reunido acompanha a transição, para que a equipe não precise reconstruí-lo.<div class="meta"><span class="tag blue">Transição entre serviços</span><span class="tag ghost">Registro fictício</span></div></div></div></div></div>
+    </li>
+    <li class="event" data-expand>
+      <button class="event-btn" type="button" aria-expanded="false" aria-controls="ev-h3"><span class="event-icon"><svg class="i"><use href="#i-stetho"/></svg></span><span><span class="event-title">Acompanhamento especializado</span><span class="event-desc">Consultas e avaliações multidisciplinares</span></span><span class="tag">2026</span><svg class="i chev"><use href="#i-chev"/></svg></button>
+      <div class="collapse" id="ev-h3" inert><div><div class="event-detail"><div class="box">Consultas com hepatologia, nutrição, psicologia e outras especialidades, conforme a avaliação da equipe.<div class="meta"><span class="tag">Registrado pela equipe</span><span class="tag ghost">Registro fictício</span></div></div></div></div></div>
+    </li>
+  </ul>
+  <p class="notice reveal"><svg class="i"><use href="#i-info"/></svg><span>Demonstração: os registros desta tela são fictícios. Informações inseridas pelo paciente precisam ser identificadas como autorrelato e validadas pela equipe quando necessário.</span></p>
+</section>
+
+<!-- =====================================================================
+     TELA 3 — DOCUMENTOS E EXAMES
+     ===================================================================== -->
+<section class="page feature-page" id="documentos" aria-labelledby="pageTitle">
+  <div class="hero reveal">
+    <div class="hero-ico"><svg class="i"><use href="#i-folder"/></svg></div>
+    <div><div class="eyebrow">Seus documentos em um só lugar</div><h2>Documentos e exames</h2><p>Guarde laudos, resultados, relatórios e imagens. Você pode organizar documentos de diferentes instituições sem depender de uma única pasta física.</p></div>
+    <svg class="lines" viewBox="0 0 300 120" aria-hidden="true"><path d="M0 90c40-30 80 20 120-10s80-40 180 0"/><path class="t" d="M0 105c50-25 90 15 140-10s90-30 160 5"/><path d="M20 60c40-20 70 10 110-8s80-30 170 2"/></svg>
+  </div>
+
+  <form class="card reveal" id="docForm" novalidate>
+    <div class="field">
+      <span class="label" id="fileLbl">Adicionar documento (protótipo)</span>
+      <div class="dropzone" id="dropzone">
+        <input type="file" id="fileInput" multiple aria-labelledby="fileLbl" aria-describedby="dzHelp">
+        <span class="dz-ico"><svg class="i"><use href="#i-upload"/></svg></span>
+        <b>Arraste e solte arquivos aqui</b>
+        <small id="dzHelp">ou clique para escolher · PDF, imagens e outros formatos</small>
+      </div>
+      <div class="file-chips" id="fileChips" aria-live="polite"></div>
+    </div>
+    <div class="form-grid">
+      <div class="field"><label for="docOrigin">Instituição de origem</label><input id="docOrigin" placeholder="Ex.: Hospital, clínica ou laboratório" autocomplete="off"></div>
+      <div class="field"><label for="docType">Tipo de documento</label><select id="docType"><option value="">Selecione uma categoria</option><option>Exame laboratorial</option><option>Laudo ou relatório</option><option>Imagem de exame</option><option>Receita ou orientação</option><option>Outro</option></select></div>
+    </div>
+    <div class="actions"><button class="btn-primary" type="submit"><svg class="i"><use href="#i-plus"/></svg> Registrar documento</button></div>
+    <div id="uploadResult" class="result" hidden role="status"></div>
+
+    <div class="section-head"><h3>Arquivos registrados</h3><span class="tag blue">Exemplos</span></div>
+    <div class="doc-tools">
+      <div class="chips" id="docFilters" role="group" aria-label="Filtrar por tipo"></div>
+      <label class="search"><span class="sr-only">Buscar documentos</span><svg class="i"><use href="#i-search"/></svg><input type="search" id="docSearch" placeholder="Buscar por nome ou instituição" autocomplete="off"></label>
+    </div>
+    <ul class="doc-list" id="docList"></ul>
+    <p class="card-sub" id="docCount" aria-live="polite"></p>
+  </form>
+  <p class="notice reveal"><svg class="i"><use href="#i-shield"/></svg><span>Nesta demonstração, o arquivo não é enviado nem armazenado em servidor. A versão real exigiria armazenamento seguro, controle de acesso, consentimento e proteção de dados.</span></p>
+</section>
+
+<!-- =====================================================================
+     TELA 4 — MINHA JORNADA (stepper + faixa paliativa)
+     ===================================================================== -->
+<section class="page feature-page" id="jornada" aria-labelledby="pageTitle">
+  <div class="hero reveal">
+    <div class="hero-ico"><svg class="i"><use href="#i-route"/></svg></div>
+    <div><div class="eyebrow">Acompanhamento multidisciplinar</div><h2>Minha jornada de cuidado</h2><p>O cuidado pode envolver diferentes profissionais e acontecer em etapas que não são iguais para todas as pessoas. A jornada é individual e definida com a equipe de saúde.</p></div>
+    <svg class="lines" viewBox="0 0 300 120" aria-hidden="true"><path d="M0 90c40-30 80 20 120-10s80-40 180 0"/><path class="t" d="M0 105c50-25 90 15 140-10s90-30 160 5"/><path d="M20 60c40-20 70 10 110-8s80-30 170 2"/></svg>
+  </div>
+  <p class="card-sub reveal" style="margin:0 0 10px">Selecione uma etapa para ver mais detalhes. A faixa verde mostra que os cuidados paliativos podem acompanhar todas as fases.</p>
+  <div class="card journey-board reveal" role="group" aria-label="Etapas da jornada">
+    <button class="step" type="button" data-step="0" aria-pressed="false">
+      <span class="step-node"><svg class="i"><use href="#i-search"/></svg><span class="num">1</span></span>
+      <span class="step-body"><b>Investigação e diagnóstico</b><span class="s-desc">Consultas, exames e avaliação clínica.</span><span class="tag blue">Conforme indicação</span></span>
+    </button>
+    <button class="step" type="button" data-step="1" aria-pressed="true">
+      <span class="step-node"><svg class="i"><use href="#i-stetho"/></svg><span class="num">2</span></span>
+      <span class="step-body"><b>Tratamento e acompanhamento</b><span class="s-desc">Seguimento com especialidades envolvidas no cuidado.</span><span class="tag blue">Contínuo</span><span class="here"><svg class="i"><use href="#i-check"/></svg> Etapa atual · exemplo</span></span>
+    </button>
+    <button class="step" type="button" data-step="2" aria-pressed="false">
+      <span class="step-node"><svg class="i"><use href="#i-hands"/></svg><span class="num">3</span></span>
+      <span class="step-body"><b>Avaliação para transplante</b><span class="s-desc">Quando indicado, pode envolver avaliações médicas, psicológicas, odontológicas e nutricionais.</span><span class="tag gold">Quando indicado</span></span>
+    </button>
+    <button class="step" type="button" data-step="3" aria-pressed="false">
+      <span class="step-node"><svg class="i"><use href="#i-sprout"/></svg><span class="num">4</span></span>
+      <span class="step-body"><b>Transplante e acompanhamento posterior</b><span class="s-desc">Preparação, procedimento e seguimento especializado, conforme avaliação clínica.</span><span class="tag">Individual</span></span>
+    </button>
+    <button class="band" type="button" data-step="4" aria-pressed="false">
+      <span class="band-ticks" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+      <span class="b-ico"><svg class="i"><use href="#i-heart"/></svg></span>
+      <span class="b-txt"><b>Cuidados paliativos</b><span>Podem estar presentes desde fases anteriores, junto a outros tratamentos, para aliviar sofrimento e apoiar qualidade de vida.</span></span>
+      <span class="tag">Em qualquer fase</span>
+    </button>
+  </div>
+  <div class="card journey-detail reveal" id="journeyDetail" aria-live="polite"></div>
+</section>
+
+<!-- =====================================================================
+     TELA 5 — EQUIPE DE CUIDADO
+     ===================================================================== -->
+<section class="page feature-page" id="equipe" aria-labelledby="pageTitle">
+  <div class="hero reveal">
+    <div class="hero-ico"><svg class="i"><use href="#i-users"/></svg></div>
+    <div><div class="eyebrow">Cuidado em rede</div><h2>Equipe de cuidado</h2><p>Uma jornada integrada pode envolver diferentes especialidades. A participação de cada profissional depende das necessidades e da avaliação clínica.</p></div>
+    <svg class="lines" viewBox="0 0 300 120" aria-hidden="true"><path d="M0 90c40-30 80 20 120-10s80-40 180 0"/><path class="t" d="M0 105c50-25 90 15 140-10s90-30 160 5"/><path d="M20 60c40-20 70 10 110-8s80-30 170 2"/></svg>
+  </div>
+  <p class="card-sub reveal" style="margin:0 0 10px">Toque em uma especialidade para conhecer o papel dela na jornada.</p>
+  <div class="team-grid" id="teamGrid"></div>
+
+  <form class="card reveal" id="contactForm" style="margin-top:18px" novalidate>
+    <div class="card-title">Solicitar contato da equipe</div>
+    <p class="card-sub">Envie uma solicitação para que o serviço responsável entre em contato, conforme seus canais e horários de atendimento.</p>
+    <div class="notice alert" role="note"><svg class="i"><use href="#i-phone"/></svg><span><b>Não é urgência.</b> Este canal demonstrativo não é atendimento de urgência e não garante resposta imediata. Em situações de emergência, procure atendimento presencial ou acione o SAMU (192).</span></div>
+    <div class="field">
+      <fieldset class="topics">
+        <legend>Assunto</legend>
+        <label class="topic"><input type="radio" name="topic" value="Tenho uma dúvida sobre meu acompanhamento" checked><span class="radio" aria-hidden="true"></span><span>Tenho uma dúvida sobre meu acompanhamento</span></label>
+        <label class="topic"><input type="radio" name="topic" value="Preciso relatar uma mudança no meu estado de saúde"><span class="radio" aria-hidden="true"></span><span>Preciso relatar uma mudança no meu estado de saúde</span></label>
+        <label class="topic"><input type="radio" name="topic" value="Preciso de orientação sobre uma consulta ou exame"><span class="radio" aria-hidden="true"></span><span>Preciso de orientação sobre uma consulta ou exame</span></label>
+        <label class="topic"><input type="radio" name="topic" value="Gostaria de conversar sobre cuidados paliativos"><span class="radio" aria-hidden="true"></span><span>Gostaria de conversar sobre cuidados paliativos</span></label>
+      </fieldset>
+    </div>
+    <div class="field"><label for="contactMessage">Mensagem</label><textarea id="contactMessage" placeholder="Conte brevemente como podemos ajudar..."></textarea></div>
+    <div class="actions"><button class="btn-primary" type="submit" id="contactBtn"><svg class="i"><use href="#i-send"/></svg> Solicitar contato</button></div>
+    <div id="contactResult" class="result" hidden role="status"></div>
+  </form>
+</section>
+
+<!-- =====================================================================
+     TELA 6 — TRADUTOR DA SAÚDE
+     ===================================================================== -->
+<section class="page feature-page" id="tradutor" aria-labelledby="pageTitle">
+  <div class="hero reveal">
+    <div class="hero-ico"><svg class="i"><use href="#i-sparkles"/></svg></div>
+    <div><div class="eyebrow">Inteligência artificial como apoio</div><h2>Tradutor da Saúde</h2><p>Transforme termos e trechos de documentos médicos em explicações mais simples. A ferramenta apoia a compreensão, mas não substitui a interpretação do profissional responsável.</p></div>
+    <svg class="lines" viewBox="0 0 300 120" aria-hidden="true"><path d="M0 90c40-30 80 20 120-10s80-40 180 0"/><path class="t" d="M0 105c50-25 90 15 140-10s90-30 160 5"/><path d="M20 60c40-20 70 10 110-8s80-30 170 2"/></svg>
+  </div>
+  <div class="card reveal">
+    <div class="examples" id="trExamples"><span class="lbl">Experimente um exemplo:</span></div>
+    <div class="field"><label for="medicalText">O que você gostaria de entender?</label><textarea id="medicalText" placeholder="Cole um termo ou trecho do seu exame ou relatório..."></textarea></div>
+    <div class="actions"><button class="btn-primary" type="button" id="explainBtn"><svg class="i"><use href="#i-sparkles"/></svg> <span>Explicar em linguagem simples</span></button></div>
+    <div class="info-box"><svg class="i"><use href="#i-info"/></svg><span>Este é um protótipo visual. Na versão funcional, a IA explicaria o conteúdo em linguagem acessível, destacaria termos que merecem esclarecimento e indicaria que dúvidas clínicas devem ser confirmadas com a equipe responsável.</span></div>
+    <div class="result" id="explainResult" hidden></div>
+    <p class="notice alert"><svg class="i"><use href="#i-alert"/></svg><span>Evite inserir dados pessoais identificáveis em protótipos ou ferramentas não autorizadas pelo serviço de saúde.</span></p>
+    <p class="notice"><svg class="i"><use href="#i-shield"/></svg><span>A ferramenta não diagnostica, não prescreve e não decide tratamento. Dúvidas clínicas devem ser confirmadas com a equipe responsável.</span></p>
+  </div>
+</section>
+
+<!-- =====================================================================
+     TELA 7 — DEPOIS DA CONSULTA
+     ===================================================================== -->
+<section class="page feature-page" id="consulta" aria-labelledby="pageTitle">
+  <div class="hero reveal">
+    <div class="hero-ico"><svg class="i"><use href="#i-notes"/></svg></div>
+    <div><div class="eyebrow">Organização pós-consulta</div><h2>Depois da consulta</h2><p>Registre o que foi conversado e organize orientações, dúvidas e próximos passos para não depender apenas da memória em um momento de preocupação.</p></div>
+    <svg class="lines" viewBox="0 0 300 120" aria-hidden="true"><path d="M0 90c40-30 80 20 120-10s80-40 180 0"/><path class="t" d="M0 105c50-25 90 15 140-10s90-30 160 5"/><path d="M20 60c40-20 70 10 110-8s80-30 170 2"/></svg>
+  </div>
+  <div class="card reveal">
+    <div class="examples"><span class="lbl">Não sabe por onde começar?</span><button class="chip example" type="button" id="consultExample"><svg class="i"><use href="#i-sparkles"/></svg> Preencher com um exemplo</button></div>
+    <div class="field"><label for="consultNotes">O que foi conversado na consulta?</label><textarea id="consultNotes" placeholder="Registre com suas palavras o que você lembra da consulta..."></textarea></div>
+    <div class="field"><label for="consultOrient">Orientações recebidas</label><textarea id="consultOrient" placeholder="Ex.: exames solicitados, orientações e cuidados..."></textarea></div>
+    <div class="actions"><button class="btn-primary" type="button" id="notesBtn"><svg class="i"><use href="#i-list"/></svg> <span>Organizar minhas anotações</span></button></div>
+    <div id="notesResult" class="result" hidden></div>
+    <p class="notice alert"><svg class="i"><use href="#i-alert"/></svg><span>As anotações são um apoio à memória. Confirme orientações, doses, tratamentos e decisões com o profissional de saúde.</span></p>
+  </div>
+</section>
+
+<!-- =====================================================================
+     TELA 8 — CUIDADOS PALIATIVOS
+     ===================================================================== -->
+<section class="page feature-page" id="paliativos" aria-labelledby="pageTitle">
+  <div class="hero pal-hero reveal">
+    <div class="hero-ico" style="background:linear-gradient(145deg,var(--teal),var(--teal-strong))"><svg class="i"><use href="#i-heart"/></svg></div>
+    <div><div class="eyebrow">Informação, acolhimento e qualidade de vida</div><h2>Cuidados paliativos</h2><p>Cuidados paliativos são cuidados de saúde voltados à prevenção e ao alívio do sofrimento, promovendo qualidade de vida para pacientes e familiares que enfrentam doenças graves.</p></div>
+    <!-- Ilustração original: mãos acolhendo um coração -->
+    <div class="pal-art" aria-hidden="true">
+      <svg viewBox="0 0 220 170">
+        <circle class="art-ring" cx="110" cy="84" r="76"/>
+        <circle class="art-ring dash" cx="110" cy="84" r="58"/>
+        <path class="art-heart" d="M110 98s-26-15.5-26-31.5a13 13 0 0 1 26-3.6 13 13 0 0 1 26 3.6c0 16-26 31.5-26 31.5z"/>
+        <path class="hand" d="M22 96c18-4 40 10 60 20 14 7 22 14 26 26v8c-30 2-62-8-84-24-8-6-14-14-12-22 2-6 6-8 10-8z"/>
+        <path class="hand" d="M198 96c-18-4-40 10-60 20-14 7-22 14-26 26v8c30 2 62-8 84-24 8-6 14-14 12-22-2-6-6-8-10-8z"/>
+        <path d="M70 24c6 4 8 10 6 16M160 20c-4 6-4 12 0 18" class="art-ring" style="stroke:var(--teal);stroke-width:2.5;stroke-linecap:round"/>
+        <circle class="art-dot" cx="40" cy="44" r="4"/><circle class="art-dot b" cx="186" cy="52" r="3.5"/>
+      </svg>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="card pal-card lift reveal"><div class="event-icon teal"><svg class="i"><use href="#i-heart"/></svg></div><h3>Não é desistir do tratamento</h3><p>Podem ser oferecidos junto a tratamentos destinados a controlar a doença ou buscar a cura. Não são exclusivos dos últimos dias de vida.</p></div>
+    <div class="card pal-card lift reveal"><div class="event-icon teal"><svg class="i"><use href="#i-leaf"/></svg></div><h3>Cuidar da pessoa por inteiro</h3><p>Consideram sintomas físicos, sofrimento emocional, necessidades sociais, espirituais e familiares, respeitando valores e preferências.</p></div>
+  </div>
+
+  <div class="card reveal" style="margin-top:16px">
+    <h3 class="card-title" id="palQ">O que você gostaria de conversar com a equipe?</h3>
+    <p class="card-sub">Escolha um ou mais temas. O CUIDAR sugere perguntas para você levar à próxima conversa.</p>
+    <div class="chips" id="palChips" role="group" aria-labelledby="palQ" style="margin-top:14px"></div>
+    <div class="actions" style="margin-top:16px"><button class="btn-primary" type="button" id="palBtn"><svg class="i"><use href="#i-question"/></svg> Preparar conversa com a equipe</button></div>
+    <div class="result" id="palResult" hidden></div>
+  </div>
+  <p class="notice teal reveal"><svg class="i"><use href="#i-info"/></svg><span>Conteúdo educativo. A indicação e o plano de cuidados devem ser discutidos com a equipe assistencial.</span></p>
+</section>
+
+<!-- =====================================================================
+     RODAPÉ
+     ===================================================================== -->
+<footer class="footer">
+  <div class="foot-mark"><svg class="i"><use href="#i-heart"/></svg> CUIDAR · Protótipo conceitual para projeto acadêmico de IA aplicada</div><br>
+  Dados e registros exibidos são fictícios. Não é um prontuário eletrônico nem um serviço de atendimento médico.
+</footer>
+</main>
+</div>
+
+<!-- Barra inferior (celular) -->
+<nav class="bottom-nav" aria-label="Navegação rápida">
+  <button type="button" data-page="inicio"><svg class="i"><use href="#i-home"/></svg>Início</button>
+  <button type="button" data-page="documentos"><svg class="i"><use href="#i-folder"/></svg>Documentos</button>
+  <button type="button" data-page="jornada"><svg class="i"><use href="#i-route"/></svg>Jornada</button>
+  <button type="button" data-page="equipe"><svg class="i"><use href="#i-users"/></svg>Equipe</button>
+  <button type="button" id="moreBtn" aria-controls="sidebar" aria-expanded="false"><svg class="i"><use href="#i-dots"/></svg>Mais</button>
+</nav>
+
+<!-- Modal genérico (pré-visualização, orientações, ajuda) -->
+<dialog class="modal" id="modal" aria-labelledby="modalTitle">
+  <div class="modal-inner">
+    <div class="modal-head"><div><div class="eyebrow" id="modalEyebrow"></div><h2 id="modalTitle"></h2></div><button class="icon-btn" type="button" id="modalClose" aria-label="Fechar"><svg class="i"><use href="#i-x"/></svg></button></div>
+    <div id="modalBody"></div>
+  </div>
+</dialog>
+
+<!-- Boas-vindas em 3 passos (sem a pergunta de perfil, que irá para o primeiro login) -->
+<dialog class="modal tour" id="tour" aria-labelledby="tourTitle">
+  <div class="modal-inner">
+    <div class="tour-dots" aria-hidden="true"><i class="on"></i><i></i><i></i></div>
+    <section class="tour-step" data-s="0">
+      <div class="tour-art" aria-hidden="true"><svg class="i"><use href="#i-heart"/></svg></div>
+      <h2 id="tourTitle">Boas-vindas ao CUIDAR</h2>
+      <p>Um só lugar para reunir documentos, consultas e orientações da sua jornada de saúde. Em dois passos rápidos, vamos deixar a leitura confortável para você.</p>
+    </section>
+    <section class="tour-step" data-s="1" hidden>
+      <div class="tour-art" aria-hidden="true"><svg class="i"><use href="#i-type"/></svg></div>
+      <h2>Como fica melhor para ler?</h2>
+      <p class="tour-sample">Este é um exemplo de texto. Use os botões abaixo até ficar confortável para você.</p>
+      <div class="tour-controls">
+        <button class="btn-soft big" type="button" data-act="down">A− Diminuir</button>
+        <button class="btn-soft big" type="button" data-act="up">A+ Aumentar</button>
+        <button class="btn-soft big" type="button" data-act="contrast"><svg class="i"><use href="#i-contrast"/></svg> Alto contraste</button>
+      </div>
+      <p class="card-sub" style="margin-top:12px">Você pode mudar isso a qualquer momento no botão <b>Ajustes</b>, no alto da tela.</p>
+    </section>
+    <section class="tour-step" data-s="2" hidden>
+      <div class="tour-art" aria-hidden="true"><svg class="i"><use href="#i-shield"/></svg></div>
+      <h2>Antes de começar</h2>
+      <ul class="tips">
+        <li><svg class="i"><use href="#i-info"/></svg><span>Este é um protótipo. Todos os dados são <b>fictícios</b> e nada do que você digita é guardado.</span></li>
+        <li><svg class="i"><use href="#i-sparkles"/></svg><span>As ferramentas de apoio <b>não diagnosticam</b> e não indicam tratamento. Dúvidas clínicas devem ser confirmadas com a equipe.</span></li>
+        <li><svg class="i"><use href="#i-phone"/></svg><span>O CUIDAR <b>não é atendimento de urgência</b>. Em emergência, ligue para o <b>SAMU (192)</b>. O botão vermelho fica sempre no alto da tela.</span></li>
+      </ul>
+    </section>
+    <div class="tour-foot"><button class="btn-link" type="button" id="tourSkip">Pular</button><div><button class="btn-soft" type="button" id="tourBack" hidden>Voltar</button><button class="btn-primary" type="button" id="tourNext">Continuar</button></div></div>
+  </div>
+</dialog>
+
+<div class="toasts" id="toasts" role="status" aria-live="polite"></div>
+<div class="sr-only" id="srLive" aria-live="polite"></div>
+
+<script>
+/* =====================================================================
+   0. UTILITÁRIOS
+   Nada aqui faz chamadas de rede nem guarda dados (sem localStorage).
+   ===================================================================== */
+const $ = (s, el = document) => el.querySelector(s);
+const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+const root = document.documentElement;
+const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+const ic = (n, cls = '') => `<svg class="i ${cls}" aria-hidden="true"><use href="#i-${n}"/></svg>`;
+const wait = ms => new Promise(r => setTimeout(r, reduced() ? 0 : ms));
+const norm = s => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+const announce = msg => { const l = $('#srLive'); l.textContent = ''; setTimeout(() => l.textContent = msg, 50); };
+function el(tag, cls, text) { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+
+/* =====================================================================
+   1. NAVEGAÇÃO ENTRE TELAS (hash #/tela, transições e stagger)
+   ===================================================================== */
+const titles = {inicio:'Visão geral',historico:'Histórico de saúde',documentos:'Documentos e exames',jornada:'Minha jornada',equipe:'Equipe de cuidado',tradutor:'Tradutor da Saúde',consulta:'Depois da consulta',paliativos:'Cuidados paliativos'};
+$$('.page').forEach(p => $$('.reveal', p).forEach((r, i) => r.style.setProperty('--i', i)));
+
+function showPage(id, {focus = true} = {}) {
+  if (!titles[id]) id = 'inicio';
+  $$('.page').forEach(p => p.classList.toggle('active', p.id === id));
+  $$('[data-page]').forEach(b => b.dataset.page === id ? b.setAttribute('aria-current', 'page') : b.removeAttribute('aria-current'));
+  $('#pageTitle').textContent = titles[id];
+  document.title = `${titles[id]} · CUIDAR`;
+  closeDrawer();
+  window.scrollTo({top: 0, behavior: reduced() ? 'auto' : 'smooth'});
+  if (id === 'inicio') animateCounters();
+  if (focus) $('#pageTitle').focus({preventScroll: true});
+}
+function go(id) { showPage(id); try { if (location.hash !== '#/' + id) history.pushState(null, '', '#/' + id); } catch (e) { /* alguns modos de visualização bloqueiam o histórico */ } }
+const fromHash = () => showPage(location.hash.replace('#/', '') || 'inicio');
+window.addEventListener('popstate', fromHash);
+window.addEventListener('hashchange', fromHash);
+
+// Delegação: navegação, toasts simples e pré-visualização
+document.addEventListener('click', e => {
+  const nav = e.target.closest('[data-page]'); if (nav) { go(nav.dataset.page); return; }
+  const g = e.target.closest('[data-go]'); if (g) { go(g.dataset.go); return; }
+  const t = e.target.closest('[data-toast]'); if (t) toast(t.dataset.toast);
+  const pv = e.target.closest('[data-preview]'); if (pv) openPreview(baseDocs[+pv.dataset.preview], 'Pré-visualização demonstrativa');
+});
+
+/* =====================================================================
+   2. GAVETA LATERAL (celular) e painel de acessibilidade
+   ===================================================================== */
+const sidebar = $('#sidebar'), scrim = $('#scrim');
+function openDrawer() { sidebar.classList.add('open'); scrim.classList.add('show'); $('#menuBtn').setAttribute('aria-expanded','true'); $('#moreBtn').setAttribute('aria-expanded','true'); setTimeout(() => $('.nav-btn[aria-current]', sidebar)?.focus(), 60); }
+function closeDrawer() { if (!sidebar.classList.contains('open')) return; sidebar.classList.remove('open'); scrim.classList.remove('show'); $('#menuBtn').setAttribute('aria-expanded','false'); $('#moreBtn').setAttribute('aria-expanded','false'); }
+$('#menuBtn').addEventListener('click', openDrawer);
+$('#moreBtn').addEventListener('click', openDrawer);
+scrim.addEventListener('click', closeDrawer);
+const toolsPanel = $('#toolsPanel');
+$('#a11yToggle').addEventListener('click', e => { const open = toolsPanel.classList.toggle('open'); e.currentTarget.setAttribute('aria-expanded', open); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeDrawer(); if (toolsPanel.classList.contains('open')) { toolsPanel.classList.remove('open'); $('#a11yToggle').setAttribute('aria-expanded','false'); $('#a11yToggle').focus(); } } });
+document.addEventListener('click', e => { if (toolsPanel.classList.contains('open') && !e.target.closest('.tools')) { toolsPanel.classList.remove('open'); $('#a11yToggle').setAttribute('aria-expanded','false'); } });
+
+/* =====================================================================
+   3. TOASTS DE FEEDBACK
+   ===================================================================== */
+function toast(msg, icon = 'check') {
+  const wrap = $('#toasts');
+  const t = el('div', 'toast'); t.innerHTML = `<span class="t-ico">${ic(icon)}</span>`; t.append(el('span', '', msg));
+  wrap.append(t);
+  while (wrap.children.length > 3) wrap.firstElementChild.remove();
+  setTimeout(() => { t.classList.add('out'); setTimeout(() => t.remove(), 300); }, 3200);
+}
+
+/* =====================================================================
+   4. MODAL (pré-visualização fictícia, orientações, ajuda)
+   ===================================================================== */
+const modal = $('#modal'); let modalOpener = null;
+function openModal({eyebrow = '', title, body}) {
+  modalOpener = document.activeElement;
+  $('#modalEyebrow').textContent = eyebrow; $('#modalTitle').textContent = title;
+  const b = $('#modalBody'); b.innerHTML = ''; typeof body === 'string' ? b.innerHTML = body : b.append(body);
+  modal.showModal(); $('#modalClose').focus();
+}
+modal.addEventListener('close', () => modalOpener?.focus?.());
+$('#modalClose').addEventListener('click', () => modal.close());
+modal.addEventListener('click', e => { if (e.target === modal) modal.close(); });
+
+function openPreview(d, label) {
+  const wrap = el('div');
+  const sheet = el('div', 'preview-sheet');
+  sheet.innerHTML = `<div class="ph"><span>DOCUMENTO DEMONSTRATIVO</span><span>${d.ext}</span></div>` +
+    (d.ext === 'IMG' ? '<div class="preview-img"></div>' : '') +
+    '<div class="ln" style="width:70%"></div><div class="ln"></div><div class="ln" style="width:88%"></div><div class="ln" style="width:55%"></div><div class="ln"></div><div class="ln" style="width:76%"></div><div class="watermark">FICTÍCIO</div>';
+  const meta = el('div', 'chips'); meta.style.margin = '14px 0 0';
+  [d.type, d.origin, d.date].forEach(m => meta.append(el('span', 'tag blue', m)));
+  const n = el('p', 'notice'); n.innerHTML = ic('info'); n.append(el('span', '', `${label}: nenhum conteúdo real é exibido. Nesta demonstração, o arquivo não é enviado nem armazenado em servidor.`));
+  wrap.append(sheet, meta, n);
+  openModal({eyebrow: label, title: d.name, body: wrap});
+}
+
+$('#apptBtn').addEventListener('click', () => openModal({
+  eyebrow: 'Detalhes do compromisso demonstrativos', title: 'Consulta · Hepatologia',
+  body: `<div class="chips" style="margin-bottom:14px"><span class="tag blue">${ic('calendar')} 12 de novembro</span><span class="tag blue">${ic('clock')} 09:30</span><span class="tag">Hospital de referência · Ambulatório</span></div>
+  <ul class="tips">
+    <li>${ic('folder')}<span>Leve documento com foto, cartão do SUS e seus exames recentes (estão em “Documentos e exames”).</span></li>
+    <li>${ic('question')}<span>Anote antes as dúvidas que quer levar. A tela “Depois da consulta” ajuda a organizar o que for conversado.</span></li>
+    <li>${ic('users')}<span>Se possível, vá com um familiar ou uma pessoa de confiança.</span></li>
+  </ul>
+  <p class="notice">${ic('info')}<span>Orientações gerais e fictícias. Siga sempre o que o serviço de saúde informar.</span></p>`
+}));
+
+$('#helpBtn').addEventListener('click', () => {
+  toast('Central de ajuda demonstrativa', 'help');
+  openModal({eyebrow: 'Central de ajuda demonstrativa', title: 'Como usar o CUIDAR', body: `<ul class="tips">
+    <li>${ic('menu')}<span>Use o menu para navegar. No celular, use a barra inferior ou o botão “Mais”.</span></li>
+    <li>${ic('type')}<span>Use <b>A+</b> e <b>A−</b> para aumentar ou diminuir o texto. O botão de contraste deixa as cores mais fortes.</span></li>
+    <li>${ic('moon')}<span>O botão de lua ativa o modo escuro, que pode ser mais confortável à noite.</span></li>
+    <li>${ic('shield')}<span>Todos os dados são fictícios. Este protótipo não envia nem guarda o que você digita.</span></li>
+    <li>${ic('phone')}<span>O CUIDAR não é atendimento de urgência. Em emergências, procure atendimento presencial ou ligue para o SAMU (192).</span></li>
+  </ul>`});
+});
+
+/* =====================================================================
+   5. CONTADORES ANIMADOS (indicadores da Visão geral)
+   ===================================================================== */
+function animateCounters() {
+  $$('[data-count]').forEach(n => {
+    const target = +n.dataset.count, pad = +(n.dataset.pad || 0);
+    const fmt = v => String(v).padStart(pad, '0');
+    if (reduced()) { n.textContent = fmt(target); return; }
+    const t0 = performance.now(), dur = 1300;
+    const tick = now => { const p = Math.min(1, (now - t0) / dur); n.textContent = fmt(Math.round(target * (1 - Math.pow(1 - p, 3)))); if (p < 1) requestAnimationFrame(tick); };
+    requestAnimationFrame(tick);
+  });
+}
+
+/* =====================================================================
+   6. ITENS EXPANSÍVEIS (linha do tempo e equipe)
+   ===================================================================== */
+document.addEventListener('click', e => {
+  const btn = e.target.closest('[aria-controls]'); if (!btn) return;
+  const item = btn.closest('[data-expand]'); if (!item) return;
+  const open = !item.classList.contains('is-open');
+  item.classList.toggle('is-open', open);
+  btn.setAttribute('aria-expanded', open);
+  document.getElementById(btn.getAttribute('aria-controls')).inert = !open;
+});
+
+/* =====================================================================
+   7. DOCUMENTOS — arrastar e soltar, filtros, busca, pré-visualização
+   Arquivos registrados aqui ficam só na memória da página (somem ao recarregar).
+   ===================================================================== */
+const docs = [
+  {name:'Hemograma completo', type:'Exame laboratorial', origin:'Laboratório', date:'04 nov 2026', ext:'PDF'},
+  {name:'Relatório médico', type:'Laudo ou relatório', origin:'Hospital de referência', date:'28 out 2026', ext:'PDF'},
+  {name:'Relatório de acompanhamento', type:'Laudo ou relatório', origin:'Outro serviço de saúde', date:'28 out 2026', ext:'PDF'},
+  {name:'Imagem de exame', type:'Imagem de exame', origin:'Clínica de imagem', date:'15 out 2026', ext:'IMG'},
+  {name:'Orientações nutricionais', type:'Receita ou orientação', origin:'Ambulatório de nutrição', date:'21 out 2026', ext:'PDF'}
+];
+const baseDocs = docs.slice(); // referência fixa para os “Documentos recentes” da Visão geral
+const docTypes = ['Todos','Exame laboratorial','Laudo ou relatório','Imagem de exame','Receita ou orientação','Outro'];
+let docFilter = 'Todos';
+const fileInput = $('#fileInput'), dz = $('#dropzone');
+
+docTypes.forEach(t => { const c = el('button', 'chip'); c.type = 'button'; c.setAttribute('aria-pressed', t === docFilter); c.innerHTML = ic('check', 'chk'); c.append(t); c.dataset.filter = t; $('#docFilters').append(c); });
+$('#docFilters').addEventListener('click', e => { const c = e.target.closest('[data-filter]'); if (!c) return; docFilter = c.dataset.filter; $$('[data-filter]').forEach(x => x.setAttribute('aria-pressed', x === c)); renderDocs(); });
+$('#docSearch').addEventListener('input', renderDocs);
+
+function renderDocs(newIdx = -1) {
+  const q = norm($('#docSearch').value.trim());
+  const list = $('#docList'); list.innerHTML = '';
+  const shown = docs.map((d, i) => ({d, i})).filter(({d}) => (docFilter === 'Todos' || d.type === docFilter) && (!q || norm(`${d.name} ${d.origin} ${d.type}`).includes(q)));
+  shown.forEach(({d, i}) => {
+    const li = el('li', 'doc-row' + (i === newIdx ? ' is-new' : ''));
+    li.innerHTML = `<span class="doc-ext ${d.ext === 'IMG' ? 'img' : ''}" aria-hidden="true"></span><div class="doc-info"><b></b><small></small></div><span class="tag ${d.temp ? 'gold' : 'blue'}"></span>`;
+    li.querySelector('.doc-ext').textContent = d.ext;
+    li.querySelector('b').textContent = d.name;
+    li.querySelector('small').textContent = `${d.origin} · ${d.date}`;
+    li.querySelector('.tag').textContent = d.temp ? 'Simulação' : d.type;
+    const b = el('button', 'btn-link'); b.type = 'button'; b.innerHTML = ic('eye') + ' Abrir'; b.setAttribute('aria-label', `Abrir ${d.name}`);
+    b.addEventListener('click', () => openPreview(d, 'Arquivo demonstrativo'));
+    li.append(b); list.append(li);
+  });
+  if (!shown.length) list.innerHTML = '<li class="empty-state">Nenhum documento encontrado com esse filtro ou busca.</li>';
+  $('#docCount').textContent = `${shown.length} de ${docs.length} documento(s) exibido(s).`;
+}
+
+function showFileChips() {
+  const box = $('#fileChips'); box.innerHTML = '';
+  [...fileInput.files].forEach(f => { const s = el('span'); s.innerHTML = ic('file'); s.append(f.name); box.append(s); });
+}
+fileInput.addEventListener('change', showFileChips);
+['dragenter','dragover'].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.add('drag'); }));
+['dragleave','drop'].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.remove('drag'); }));
+dz.addEventListener('drop', e => { if (e.dataTransfer?.files?.length) { fileInput.files = e.dataTransfer.files; showFileChips(); toast(`${e.dataTransfer.files.length} arquivo(s) pronto(s) para registrar`, 'upload'); } });
+
+$('#docForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const out = $('#uploadResult'); out.hidden = false;
+  const files = [...fileInput.files];
+  if (!files.length) { out.innerHTML = `<div class="result-head"><span class="badge">${ic('info')}</span>Nenhum arquivo selecionado</div><p class="result-msg">Selecione um arquivo para simular o registro. Esta demonstração não armazena documentos.</p>`; return; }
+  const type = $('#docType').value || 'Outro', origin = $('#docOrigin').value.trim() || 'Instituição não informada';
+  files.forEach(f => { const ext = /\.(png|jpe?g|gif|webp|heic|bmp)$/i.test(f.name) ? 'IMG' : (f.name.split('.').pop() || 'DOC').slice(0, 4).toUpperCase(); docs.unshift({name: f.name, type, origin, date: 'Hoje · não armazenado', ext, temp: true}); });
+  out.innerHTML = `<div class="result-head"><span class="badge">${ic('check')}</span>Registro simulado</div><p class="result-msg">${files.length} arquivo(s) selecionado(s). No protótipo, nenhum arquivo será enviado ou armazenado.</p>`;
+  docFilter = 'Todos'; $$('[data-filter]').forEach(x => x.setAttribute('aria-pressed', x.dataset.filter === 'Todos')); $('#docSearch').value = '';
+  renderDocs(0);
+  e.target.reset(); $('#fileChips').innerHTML = '';
+  toast('Documento registrado na simulação', 'folder');
+});
+
+/* =====================================================================
+   8. MINHA JORNADA — stepper clicável
+   ===================================================================== */
+const journey = [
+  {icon:'search', title:'Investigação e diagnóstico', tag:['blue','Conforme indicação'], desc:'Consultas, exames e avaliação clínica.', who:'Hepatologia / Gastroenterologia, com apoio de exames laboratoriais e de imagem.', help:'Reunir exames e relatórios de diferentes serviços e preparar dúvidas para as consultas.'},
+  {icon:'stetho', title:'Tratamento e acompanhamento', tag:['blue','Contínuo'], desc:'Seguimento com especialidades envolvidas no cuidado.', who:'Hepatologia, nutrição, psicologia e outras especialidades, conforme a necessidade.', help:'Registrar orientações em “Depois da consulta” e acompanhar os próximos compromissos.'},
+  {icon:'hands', title:'Avaliação para transplante', tag:['gold','Quando indicado'], desc:'Quando indicado, pode envolver avaliações médicas, psicológicas, odontológicas e nutricionais.', who:'Cirurgia do aparelho digestivo, hepatologia, psicologia, odontologia e nutrição.', help:'Organizar a lista de avaliações e os documentos solicitados pela equipe.'},
+  {icon:'sprout', title:'Transplante e acompanhamento posterior', tag:['','Individual'], desc:'Preparação, procedimento e seguimento especializado, conforme avaliação clínica.', who:'Equipe de transplante e especialidades do seguimento.', help:'Manter o histórico acessível para o seguimento especializado, em qualquer serviço.'},
+  {icon:'heart', title:'Cuidados paliativos', tag:['','Em qualquer fase'], desc:'Podem estar presentes desde fases anteriores, junto a outros tratamentos, para aliviar sofrimento e apoiar qualidade de vida.', who:'Equipe de cuidados paliativos, junto com as demais especialidades.', help:'Preparar conversas sobre sintomas, apoio à família e preferências na tela “Cuidado paliativo”.', link:true}
+];
+function selectStep(i) {
+  $$('[data-step]').forEach(b => b.setAttribute('aria-pressed', +b.dataset.step === i));
+  const s = journey[i], box = $('#journeyDetail');
+  box.innerHTML = `<div class="jd-head"><span class="event-icon ${i === 4 ? 'teal' : ''}">${ic(s.icon)}</span><div style="flex:1;min-width:200px"><div class="eyebrow">Etapa ${i < 4 ? i + 1 + ' de 4' : 'que atravessa toda a jornada'}</div><h3 class="card-title"></h3></div><span class="tag ${s.tag[0]}">${s.tag[1]}</span></div>
+    <p class="card-sub" style="margin-top:10px"></p>
+    <div class="jd-grid"><div><b>Quem pode participar</b><span class="w"></span></div><div><b>Como o CUIDAR ajuda</b><span class="h"></span></div></div>
+    ${s.link ? `<div class="actions" style="margin-top:14px"><button class="btn-soft" type="button" data-go="paliativos">${ic('heart')} Ir para Cuidado paliativo</button></div>` : ''}`;
+  $('.card-title', box).textContent = s.title; $('.card-sub', box).textContent = s.desc;
+  $('.w', box).textContent = s.who; $('.h', box).textContent = s.help;
+  box.style.animation = 'none'; box.offsetHeight; box.style.animation = 'rise .4s var(--ease)';
+}
+$$('[data-step]').forEach(b => b.addEventListener('click', () => selectStep(+b.dataset.step)));
+
+/* =====================================================================
+   9. EQUIPE — cards expansíveis + contato com protocolo e status
+   ===================================================================== */
+const team = [
+  ['stetho','Hepatologia / Gastroenterologia','Acompanhamento do fígado e sistema digestivo','Acompanha a saúde do fígado e do sistema digestivo, solicita exames e coordena o seguimento clínico junto com as outras especialidades.'],
+  ['cross','Cirurgia do aparelho digestivo','Avaliação cirúrgica e transplante','Avalia quando um procedimento cirúrgico é indicado e participa da avaliação e do acompanhamento do transplante, quando houver indicação.'],
+  ['ribbon','Oncologia','Quando há indicação oncológica','Participa do cuidado quando há indicação oncológica e planeja, junto com a equipe, as opções de tratamento.'],
+  ['brain','Psicologia','Apoio emocional ao paciente e família','Oferece escuta e apoio emocional ao paciente e à família nas diferentes fases da jornada, incluindo momentos de decisão.'],
+  ['tooth','Odontologia','Avaliação e saúde bucal','Avalia a saúde bucal, o que pode fazer parte da preparação para alguns tratamentos, como a avaliação para transplante.'],
+  ['apple','Nutrição','Acompanhamento nutricional','Orienta a alimentação de acordo com as necessidades de cada fase, sempre de forma individual.'],
+  ['eye','Oftalmologia','Conforme necessidade clínica','Avalia a saúde dos olhos quando a equipe identifica essa necessidade.'],
+  ['heart','Cuidados paliativos','Alívio do sofrimento e qualidade de vida','Cuida do alívio de sintomas e do sofrimento e apoia decisões alinhadas aos valores da pessoa. Atua em qualquer fase, junto com os outros tratamentos.']
+];
+team.forEach(([icon, name, sub, role], i) => {
+  const c = el('div', 'team-card reveal'); c.dataset.expand = ''; c.style.setProperty('--i', 2 + i);
+  c.innerHTML = `<button class="team-btn" type="button" aria-expanded="false" aria-controls="tm${i}"><span class="s-ico">${ic(icon)}</span><span><b></b><small></small></span>${ic('chev', 'chev')}</button><div class="collapse" id="tm${i}" inert><div><div class="team-role"><span class="lbl">Papel na jornada</span><span class="r"></span></div></div></div>`;
+  $('b', c).textContent = name; $('small', c).textContent = sub; $('.r', c).textContent = role;
+  $('#teamGrid').append(c);
+});
+
+let statusTimer;
+$('#contactForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const msg = $('#contactMessage').value.trim(), out = $('#contactResult'), btn = $('#contactBtn');
+  out.hidden = false; clearTimeout(statusTimer);
+  if (!msg) { out.innerHTML = `<div class="result-head"><span class="badge">${ic('info')}</span>Falta a mensagem</div><p class="result-msg">Escreva uma breve mensagem para preparar sua solicitação.</p>`; $('#contactMessage').focus(); return; }
+  btn.disabled = true; btn.innerHTML = '<span class="spinner" aria-hidden="true"></span> Enviando…';
+  await wait(900);
+  btn.disabled = false; btn.innerHTML = `${ic('send')} Solicitar contato`;
+  const proto = 'CUI-2026-' + String(Math.floor(100000 + Math.random() * 900000));
+  const topic = $('input[name="topic"]:checked').value;
+  out.innerHTML = `<div class="result-head"><span class="badge">${ic('check')}</span>Solicitação registrada (simulação)</div>
+    <p class="result-msg">Solicitação demonstrativa preparada. Em uma versão real, seria enviada ao canal institucional configurado, com protocolo e acompanhamento do status.</p>
+    <div class="protocol"><span class="card-sub" style="margin:0">Protocolo fictício</span><code>${proto}</code></div>
+    <p class="card-sub" style="margin-top:10px">Assunto: <b class="tp"></b></p>
+    <ol class="status-track" aria-label="Status da solicitação">
+      <li class="done"><span class="sdot">${ic('check')}</span><div><b>Recebida</b><small>Agora</small></div></li>
+      <li class="s2"><span class="sdot">${ic('clock')}</span><div><b>Em análise</b><small class="s2t">Aguardando</small></div></li>
+    </ol>`;
+  $('.tp', out).textContent = topic;
+  toast('Solicitação demonstrativa preparada', 'send');
+  statusTimer = setTimeout(() => {
+    const s2 = $('.s2', out); if (!s2) return;
+    s2.classList.add('current'); $('.s2t', out).textContent = 'Equipe avaliando (simulação)';
+    toast('Status atualizado: Em análise', 'clock'); announce('Status da solicitação: em análise.');
+  }, reduced() ? 600 : 2200);
+});
+
+/* =====================================================================
+   10. RESPOSTA SIMULADA COM EFEITO DE DIGITAÇÃO
+   ===================================================================== */
+const runs = new WeakMap();
+async function renderTyped(box, {head, sections, foot}) {
+  const id = (runs.get(box) || 0) + 1; runs.set(box, id);
+  const alive = () => runs.get(box) === id;
+  box.hidden = false; box.setAttribute('aria-busy', 'true');
+  box.innerHTML = `<div class="result-head"><span class="badge">${ic('sparkles')}</span>${head}</div>`;
+  for (const [k, s] of sections.entries()) {
+    if (!alive()) return;
+    const sec = el('div', `r-section s${k + 1}`); sec.innerHTML = `<h4>${ic(s.icon)}<span></span></h4><ul></ul>`;
+    $('h4 span', sec).textContent = s.title; box.append(sec);
+    const items = s.items.length ? s.items : [null];
+    for (const t of items) {
+      const li = el('li', t ? '' : 'empty'); $('ul', sec).append(li);
+      await typeInto(li, t || 'Nada identificado neste trecho.', alive);
+    }
+  }
+  if (!alive()) return;
+  const f = el('p', 'r-foot'); f.innerHTML = ic('info'); f.append(el('span', '', foot)); box.append(f);
+  box.setAttribute('aria-busy', 'false');
+  announce(`${head}. ${sections.map(s => s.title + ': ' + (s.items.join(' ') || 'nada identificado')).join('. ')}`);
+}
+function typeInto(node, text, alive) {
+  if (reduced()) { node.textContent = text; return Promise.resolve(); }
+  return new Promise(res => {
+    let i = 0; node.classList.add('typing');
+    const step = () => { if (!alive()) return res(); i = Math.min(text.length, i + 2); node.textContent = text.slice(0, i); if (i < text.length) setTimeout(step, 12); else { node.classList.remove('typing'); res(); } };
+    step();
+  });
+}
+function analyzing(box, btn, label) {
+  runs.set(box, (runs.get(box) || 0) + 1);
+  box.hidden = false; box.innerHTML = `<div class="result-head"><span class="badge"><span class="spinner" style="color:var(--blue)"></span></span>Analisando…</div><div class="skeleton"><span></span><span></span><span></span></div>`;
+  btn.disabled = true; btn.dataset.label = btn.innerHTML; btn.innerHTML = `<span class="spinner" aria-hidden="true"></span> ${label}`;
+  announce(label);
+}
+function done(btn) { btn.disabled = false; btn.innerHTML = btn.dataset.label; }
+
+/* =====================================================================
+   11. TRADUTOR DA SAÚDE (respostas fixas de exemplo — sem IA real)
+   ===================================================================== */
+const S_DIZ = {title:'O que o documento diz', icon:'file'}, S_NAO = {title:'O que não dá para concluir', icon:'alert'}, S_PERG = {title:'Perguntas para a equipe', icon:'question'};
+const trExamples = [
+  {label:'Esteatose hepática leve', text:'Ultrassonografia de abdome: fígado de dimensões normais, com aumento difuso da ecogenicidade, compatível com esteatose hepática leve.',
+   diz:['“Esteatose hepática” significa acúmulo de gordura nas células do fígado.','“Ecogenicidade” é a forma como o fígado aparece na imagem do ultrassom. Quando está aumentada, o fígado aparece mais “claro”.','“Leve” é o grau descrito pelo exame de imagem.'],
+   nao:['O ultrassom, sozinho, não mostra a causa da gordura no fígado.','O trecho não informa se há inflamação ou outras alterações. Isso depende da avaliação clínica e, às vezes, de outros exames.'],
+   perg:['O que pode ter causado a esteatose no meu caso?','Preciso de algum exame complementar?','Há mudanças de rotina recomendadas para mim?']},
+  {label:'Elastografia hepática', text:'Elastografia hepática transitória: medida de rigidez hepática de 9,8 kPa.',
+   diz:['A elastografia é um exame que estima a rigidez do fígado, ou seja, o quanto ele está mais firme ou mais macio, de forma parecida com um ultrassom.','O laudo traz um número em kPa (quilopascal), a unidade usada para essa medida.'],
+   nao:['O número, sozinho, não define o grau de alteração do fígado. A interpretação considera outros exames, o histórico e o aparelho usado.','Não é possível concluir diagnóstico ou tratamento apenas por este trecho.'],
+   perg:['O que esse valor significa no meu caso?','Ele mudou em relação aos exames anteriores?','Com que frequência esse exame deve ser repetido?']},
+  {label:'Plaquetas abaixo da referência', text:'Hemograma: plaquetas 112.000/mm³ (valor de referência: 150.000 a 450.000/mm³).',
+   diz:['Plaquetas são células do sangue que ajudam na coagulação, ou seja, a fazer o sangue parar quando há um corte.','O resultado ficou abaixo da faixa de referência usada por este laboratório.'],
+   nao:['O exame não informa a causa do valor mais baixo.','A importância desse resultado depende do seu histórico e de outros exames, e só a equipe pode avaliar.'],
+   perg:['Por que minhas plaquetas podem estar abaixo da referência?','Preciso ter algum cuidado especial no dia a dia?','Quando devo repetir este exame?']}
+];
+trExamples.forEach(x => { const b = el('button', 'chip example'); b.type = 'button'; b.innerHTML = ic('sparkles'); b.append(x.label); b.addEventListener('click', () => { $('#medicalText').value = x.text; $('#medicalText').focus(); toast(`Exemplo “${x.label}” inserido`, 'sparkles'); }); $('#trExamples').append(b); });
+
+/* v5 — MODO REAL: aberto pelo servidor local (npm start → http://localhost:3000), a pergunta vai para
+   /api/tradutor, que busca na biblioteca do CUIDAR (dados/biblioteca.json) e chama a IA só com esses verbetes.
+   Aberto com duplo clique (file://), o Tradutor continua com as respostas de exemplo. */
+const TR_REAL = location.protocol.startsWith('http');
+const TR_DADO_PESSOAL = /\d{3}\.?\d{3}\.?\d{3}-?\d{2}|\bcpf\b|cart[aã]o (do )?sus|\bcns\b|[\w.+-]+@[\w-]+\.[\w.]+|\(?\b\d{2}\)?\s?9?\d{4}-?\d{4}\b/i;
+const S_FONTE = {title:'Fontes da biblioteca do CUIDAR', icon:'shield'};
+function trMensagem(box, titulo, texto, icone = 'alert') {
+  runs.set(box, (runs.get(box) || 0) + 1); box.hidden = false;
+  box.innerHTML = `<div class="result-head"><span class="badge">${ic(icone)}</span></div><p class="result-msg"></p>`;
+  $('.result-head', box).append(titulo); $('.result-msg', box).textContent = texto;
+}
+async function tradutorReal(v, box, btn) {
+  analyzing(box, btn, 'Consultando a biblioteca…');
+  let r;
+  try {
+    const resp = await fetch('/api/tradutor', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({texto: v})});
+    r = await resp.json();
+  } catch (e) { r = {status:'erro', mensagem:'Não foi possível falar com o servidor do CUIDAR. Confira se ele está ligado (npm start).'}; }
+  done(btn);
+  if (r.status === 'ok' && r.modo === 'biblioteca') return renderTyped(box, {head:'Explicação da biblioteca do CUIDAR', sections:[
+    {title:`O que a biblioteca explica: ${r.tema}`, icon:'file', items:r.diz}, {...S_NAO, items:r.nao}, {...S_PERG, items:r.perguntas},
+    ...(r.relacionados && r.relacionados.length ? [{title:'Veja também na biblioteca', icon:'list', items:r.relacionados}] : []),
+    {...S_FONTE, items:r.fontes}], foot:r.aviso});
+  if (r.status === 'ok') return renderTyped(box, {head:'Explicação com base na biblioteca do CUIDAR', sections:[{...S_DIZ, items:r.diz}, {...S_NAO, items:r.nao}, {...S_PERG, items:r.perguntas}, {...S_FONTE, items:r.fontes}], foot:r.aviso});
+  if (r.status === 'sem_verbete') return renderTyped(box, {head:'Tema ainda não está na biblioteca', sections:[{...S_DIZ, items:[r.mensagem]}, {...S_PERG, items:r.perguntas}], foot:r.aviso});
+  trMensagem(box, r.status === 'dado_pessoal' ? 'Dado pessoal encontrado' : 'Não foi possível explicar agora', r.mensagem || 'Tente de novo em instantes.');
+}
+if (TR_REAL) fetch('/api/status').then(r => r.json()).then(s => {
+  $('#tradutor .info-box span').textContent = s.modo === 'ia'
+    ? `Conectado à biblioteca do CUIDAR (${s.verbetes} verbetes revisados): a IA explica a sua pergunta usando só a biblioteca, sempre com a fonte. Se o tema não estiver na biblioteca, a ferramenta avisa em vez de inventar.`
+    : `Conectado à biblioteca do CUIDAR (${s.verbetes} verbetes revisados): a ferramenta mostra o verbete que responde à sua pergunta, sempre com a fonte. Se o tema não estiver na biblioteca, ela avisa em vez de inventar.`;
+}).catch(() => {});
+
+$('#explainBtn').addEventListener('click', async () => {
+  const v = $('#medicalText').value.trim(), box = $('#explainResult'), btn = $('#explainBtn');
+  if (!v) { runs.set(box, (runs.get(box) || 0) + 1); box.hidden = false; box.innerHTML = `<div class="result-head"><span class="badge">${ic('info')}</span>Campo vazio</div><p class="result-msg">Cole um termo ou trecho para visualizar a área de explicação.</p>`; $('#medicalText').focus(); return; }
+  if (TR_DADO_PESSOAL.test(v)) { trMensagem(box, 'Dado pessoal encontrado', 'O texto parece ter um dado pessoal (CPF, cartão do SUS, telefone ou e-mail). Apague esse dado e tente de novo. Nada foi enviado.'); toast('Dado pessoal encontrado: nada foi enviado.', 'alert'); return; }
+  if (TR_REAL) return tradutorReal(v, box, btn);
+  analyzing(box, btn, 'Analisando…');
+  await wait(1300); done(btn);
+  const ex = trExamples.find(x => x.text === v);
+  const words = v.split(/\s+/).length;
+  await renderTyped(box, ex ? {
+    head: 'Explicação simulada',
+    sections: [{...S_DIZ, items: ex.diz}, {...S_NAO, items: ex.nao}, {...S_PERG, items: ex.perg}],
+    foot: 'Resposta de exemplo, fixa e fictícia. Dúvidas clínicas devem ser confirmadas com a equipe responsável.'
+  } : {
+    head: 'Exemplo de retorno',
+    sections: [
+      {...S_DIZ, items: [`Você enviou um trecho com ${words} palavra(s).`, 'Exemplo de retorno: a explicação seria apresentada em linguagem simples, separando o que o documento diz, o que não é possível concluir apenas por esse trecho e quais perguntas podem ser levadas à equipe.', 'Esta versão não processa conteúdo médico. Experimente um dos exemplos para ver uma explicação simulada completa.']},
+      {...S_NAO, items: ['Um trecho isolado não permite concluir diagnóstico, gravidade ou tratamento.', 'O significado de um resultado depende do seu histórico e da avaliação da equipe.']},
+      {...S_PERG, items: ['O que este resultado significa no meu caso?', 'Preciso repetir ou complementar algum exame?', 'Isso muda algo no meu acompanhamento?']}
+    ],
+    foot: 'Esta versão não processa conteúdo médico. Dúvidas clínicas devem ser confirmadas com a equipe responsável.'
+  });
+});
+
+/* =====================================================================
+   12. DEPOIS DA CONSULTA (organização simulada por palavras-chave)
+   O texto é separado em frases e agrupado localmente; nada é interpretado ou guardado.
+   ===================================================================== */
+$('#consultExample').addEventListener('click', () => {
+  $('#consultNotes').value = 'A médica disse que os exames de sangue estão sendo acompanhados. Pediu uma nova elastografia antes do retorno. Falamos sobre o cansaço que tenho sentido à tarde. Não entendi se preciso mudar o horário do remédio?';
+  $('#consultOrient').value = 'Manter a alimentação orientada pela nutricionista. Evitar bebidas alcoólicas. Retorno em 3 meses com os exames.';
+  toast('Exemplo fictício preenchido', 'sparkles');
+});
+const sentences = t => (t.match(/[^.!?\n]+[.!?]*/g) || []).map(s => s.trim()).filter(s => s.length > 2);
+$('#notesBtn').addEventListener('click', async () => {
+  const notes = $('#consultNotes').value.trim(), orient = $('#consultOrient').value.trim(), box = $('#notesResult'), btn = $('#notesBtn');
+  if (!notes && !orient) { runs.set(box, (runs.get(box) || 0) + 1); box.hidden = false; box.innerHTML = `<div class="result-head"><span class="badge">${ic('info')}</span>Nada para organizar ainda</div><p class="result-msg">Registre algumas anotações para visualizar a organização proposta.</p>`; $('#consultNotes').focus(); return; }
+  analyzing(box, btn, 'Organizando…');
+  await wait(1200); done(btn);
+  const assuntos = [], orients = [], exames = [], duvidas = [];
+  const reExame = /exame|retorno|consulta|ultrass|tomograf|resson|elastograf|hemograma|agend|bi[oó]psia/i;
+  const reDuv = /\?|d[uú]vida|n[aã]o entendi|perguntar|confirmar/i;
+  const reOri = /tomar|evitar|manter|orient|cuidado|beber|comer|dieta|repouso|usar|suspender/i;
+  sentences(notes).forEach(s => { if (reDuv.test(s)) duvidas.push(s); else if (reExame.test(s)) exames.push(s); else if (reOri.test(s)) orients.push(s); else assuntos.push(s); });
+  sentences(orient).forEach(s => { orients.push(s); if (reExame.test(s) && !exames.includes(s)) exames.push(s); });
+  duvidas.push('Confirmar com a equipe: doses, horários e duração de qualquer medicamento citado.');
+  await renderTyped(box, {
+    head: 'Suas anotações organizadas',
+    sections: [
+      {title:'Assuntos conversados', icon:'notes', items: assuntos},
+      {title:'Orientações', icon:'check', items: orients},
+      {title:'Exames ou consultas citados', icon:'calendar', items: exames},
+      {title:'Dúvidas para confirmar', icon:'question', items: duvidas}
+    ],
+    foot: 'Este protótipo não interpreta nem armazena suas informações. A organização usa apenas as suas próprias frases.'
+  });
+});
+
+/* =====================================================================
+   13. CUIDADOS PALIATIVOS — temas selecionáveis e perguntas sugeridas
+   ===================================================================== */
+const palThemes = [
+  {t:'Quero entender melhor o que são cuidados paliativos', icon:'info', q:['O que são cuidados paliativos e como podem me ajudar agora?','Posso receber cuidados paliativos junto com o tratamento que já faço?','Quem faz parte da equipe de cuidados paliativos neste serviço?']},
+  {t:'Quero conversar sobre controle de sintomas', icon:'stetho', q:['Quais sintomas devo observar e comunicar à equipe?','Como posso relatar dor, cansaço, enjoo ou outros incômodos entre as consultas?','O que fazer se um sintoma piorar fora do horário de atendimento?']},
+  {t:'Preciso de apoio como familiar ou cuidador', icon:'users', q:['Como posso apoiar no dia a dia de forma segura?','Existe apoio psicológico ou social para familiares e cuidadores?','Como posso cuidar também de mim enquanto cuido?']},
+  {t:'Quero conversar sobre qualidade de vida e preferências', icon:'heart', q:['O que é mais importante para mim neste momento, e como a equipe pode considerar isso?','Como posso registrar minhas preferências de cuidado?','Quem eu gostaria que participasse dessas conversas?']}
+];
+palThemes.forEach((p, i) => { const c = el('button', 'chip'); c.type = 'button'; c.setAttribute('aria-pressed', i === 0); c.dataset.theme = i; c.innerHTML = ic('check', 'chk'); c.append(p.t); c.addEventListener('click', () => c.setAttribute('aria-pressed', c.getAttribute('aria-pressed') !== 'true')); $('#palChips').append(c); });
+$('#palBtn').addEventListener('click', () => {
+  const sel = $$('#palChips [aria-pressed="true"]').map(c => palThemes[+c.dataset.theme]);
+  const box = $('#palResult'); box.hidden = false;
+  if (!sel.length) { box.innerHTML = `<div class="result-head"><span class="badge">${ic('info')}</span>Escolha um tema</div><p class="result-msg">Selecione ao menos um tema para preparar a conversa.</p>`; return; }
+  box.innerHTML = `<div class="result-head"><span class="badge">${ic('question')}</span>Perguntas sugeridas para levar à equipe</div>`;
+  sel.forEach((p, k) => { const g = el('div', 'q-group'); g.style.animationDelay = `${k * 90}ms`; g.innerHTML = `<h4>${ic(p.icon)}<span></span></h4><ol></ol>`; $('h4 span', g).textContent = p.t; p.q.forEach(q => $('ol', g).append(el('li', '', q))); box.append(g); });
+  const acts = el('div', 'actions'); acts.style.marginTop = '14px';
+  const copy = el('button', 'btn-soft'); copy.type = 'button'; copy.innerHTML = ic('copy') + ' Copiar perguntas';
+  copy.addEventListener('click', async () => { const txt = sel.map(p => `${p.t}\n${p.q.map((q, i) => `${i + 1}. ${q}`).join('\n')}`).join('\n\n'); try { await navigator.clipboard.writeText(txt); toast('Perguntas copiadas', 'copy'); } catch { toast('Não foi possível copiar neste navegador', 'alert'); } });
+  acts.append(copy); box.append(acts);
+  const f = el('p', 'r-foot'); f.innerHTML = ic('info'); f.append(el('span', '', 'No sistema real, sua solicitação seria encaminhada ao serviço responsável.')); box.append(f);
+  toast('No sistema real, sua solicitação seria encaminhada ao serviço responsável', 'heart');
+  announce(`${sel.length} tema(s) com perguntas sugeridas.`);
+});
+
+/* =====================================================================
+   14. ACESSIBILIDADE E APARÊNCIA — A+/A−, alto contraste, modo escuro
+   Preferências valem só durante a visita (nada é guardado).
+   ===================================================================== */
+const scales = [0.9, 1, 1.12, 1.25, 1.4]; let si = 1;
+function setScale(n) {
+  si = Math.max(0, Math.min(scales.length - 1, n));
+  root.style.setProperty('--scale', scales[si]);
+  $('#fontDown').disabled = si === 0; $('#fontUp').disabled = si === scales.length - 1;
+  $('#scaleOut').value = `${Math.round(scales[si] * 100)}%`;
+  toast(`Tamanho do texto: ${Math.round(scales[si] * 100)}%`, 'type');
+}
+$('#fontUp').addEventListener('click', () => setScale(si + 1));
+$('#fontDown').addEventListener('click', () => setScale(si - 1));
+$('#contrastBtn').addEventListener('click', e => {
+  const on = root.dataset.contrast !== 'high';
+  on ? root.dataset.contrast = 'high' : delete root.dataset.contrast;
+  e.currentTarget.setAttribute('aria-pressed', on);
+  toast(on ? 'Alto contraste ativado' : 'Alto contraste desativado', 'contrast');
+});
+function setTheme(t, silent) {
+  root.dataset.theme = t;
+  $('#themeBtn').setAttribute('aria-pressed', t === 'dark');
+  if (!silent) toast(t === 'dark' ? 'Modo escuro ativado' : 'Modo claro ativado', t === 'dark' ? 'moon' : 'sun');
+}
+$('#themeBtn').addEventListener('click', () => setTheme(root.dataset.theme === 'dark' ? 'light' : 'dark'));
+
+/* =====================================================================
+   15. DIÁRIO DE BEM-ESTAR (simulado; nada é guardado)
+   ===================================================================== */
+const moods = [
+  {l:'Muito bem', c:'var(--teal)', m:'M8 13.5c1.8 3 6.2 3 8 0'},
+  {l:'Bem', c:'var(--blue)', m:'M8.5 14c1.6 1.8 5.4 1.8 7 0'},
+  {l:'Mais ou menos', c:'var(--gold)', m:'M8.5 15h7'},
+  {l:'Com cansaço', c:'var(--gold)', m:'M8.5 16c1.6-1.2 5.4-1.2 7 0'},
+  {l:'Difícil', c:'var(--alert)', m:'M8 17c1.8-2.8 6.2-2.8 8 0'}
+];
+const faceSVG = m => `<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" stroke-width="1.5" style="fill:color-mix(in srgb,${m.c} 20%,var(--surface));stroke:${m.c}"/><circle cx="9" cy="10" r="1.15" style="fill:var(--navy)"/><circle cx="15" cy="10" r="1.15" style="fill:var(--navy)"/><path d="${m.m}" fill="none" stroke-width="1.7" stroke-linecap="round" style="stroke:var(--navy)"/></svg>`;
+let mood = -1;
+moods.forEach((m, i) => {
+  const b = el('button', 'face'); b.type = 'button'; b.setAttribute('role', 'radio'); b.setAttribute('aria-checked', 'false');
+  b.style.setProperty('--mood', m.c); b.innerHTML = faceSVG(m); b.append(el('span', '', m.l));
+  b.addEventListener('click', () => pickMood(i)); $('#faces').append(b);
+});
+['Cansaço','Enjoo','Dor','Inchaço na barriga ou nas pernas','Sono ruim','Pouco apetite','Tristeza ou ansiedade'].forEach(s => {
+  const c = el('button', 'chip'); c.type = 'button'; c.setAttribute('aria-pressed', 'false'); c.innerHTML = ic('check', 'chk'); c.append(s);
+  c.addEventListener('click', () => c.setAttribute('aria-pressed', c.getAttribute('aria-pressed') !== 'true')); $('#symChips').append(c);
+});
+const weekPast = [3, 3, 2, 3, 1, 2], weekDays = ['Dom','Seg','Ter','Qua','Qui','Sex','Hoje'];
+function renderWeek() {
+  const w = $('#week'); w.innerHTML = '';
+  const vals = [...weekPast, mood < 0 ? null : 4 - mood];
+  vals.forEach((v, i) => {
+    const b = el('div', 'bar' + (i === 6 ? ' today' : '') + (i === 6 && v != null ? ' set' : ''));
+    const bar = el('i'); const mi = v == null ? null : 4 - v;
+    bar.style.setProperty('--v', v ?? 0); bar.style.setProperty('--c', v == null ? 'var(--line)' : moods[mi].c);
+    b.title = v == null ? 'Hoje: ainda sem registro' : `${weekDays[i]}: ${moods[mi].l}`;
+    b.append(bar, el('span', '', weekDays[i])); w.append(b);
+  });
+  w.setAttribute('role', 'img');
+  w.setAttribute('aria-label', 'Últimos 7 dias, exemplo: ' + vals.map((v, i) => `${weekDays[i]} ${v == null ? 'sem registro' : moods[4 - v].l}`).join(', '));
+}
+function pickMood(i) {
+  mood = i;
+  $$('.face').forEach((f, k) => f.setAttribute('aria-checked', k === i));
+  $('#ciExtra').hidden = false; $('#ciAlert').hidden = i < 4;
+  renderWeek();
+  toast(`Registrado na simulação: ${moods[i].l}`, 'heart');
+}
+$('#ciToNotes').addEventListener('click', () => {
+  if (mood < 0) return;
+  const sy = $$('#symChips [aria-pressed="true"]').map(c => c.textContent.trim().toLowerCase());
+  const line = `Diário de bem-estar (7 nov): me senti "${moods[mood].l.toLowerCase()}".` + (sy.length ? ` Sinais marcados: ${sy.join(', ')}.` : '') + ' Posso conversar sobre isso na consulta?';
+  const n = $('#consultNotes'); n.value = (n.value.trim() ? n.value.trim() + '\n' : '') + line;
+  go('consulta'); toast('Adicionado às anotações da consulta', 'notes');
+});
+
+/* =====================================================================
+   16. PEQUENOS PASSOS DE HOJE (checklist com anel de progresso)
+   ===================================================================== */
+function burst(target) {
+  if (reduced() || root.dataset.simple === 'on') return;
+  const r = target.getBoundingClientRect(), cols = ['var(--teal)','var(--blue)','var(--sky-2)','#ef8c7f'];
+  for (let i = 0; i < 12; i++) {
+    const s = el('span', 'spark'), a = Math.random() * Math.PI * 2, d = 34 + Math.random() * 44;
+    s.style.cssText = `left:${r.left + r.width / 2}px;top:${r.top + r.height / 2}px;background:${cols[i % 4]};--dx:${Math.cos(a) * d}px;--dy:${Math.sin(a) * d}px`;
+    document.body.append(s); setTimeout(() => s.remove(), 950);
+  }
+}
+$$('.todo input').forEach(cb => cb.addEventListener('change', () => {
+  const all = $$('.todo input'), n = all.filter(x => x.checked).length;
+  $('#ringFg').style.strokeDashoffset = 150.8 * (1 - n / all.length);
+  $('#ringTxt').textContent = `${n}/${all.length}`;
+  if (cb.checked) burst($('.box', cb.closest('.todo-item')));
+  if (n === all.length) { toast('Você concluiu os passos de hoje. Muito bem!', 'leaf'); setTimeout(() => burst($('.ring')), 200); }
+}));
+
+/* =====================================================================
+   17. OUVIR A PÁGINA (voz do próprio aparelho, em português)
+   ===================================================================== */
+const synth = window.speechSynthesis;
+function setSpeak(on) {
+  const b = $('#speakBtn'); b.setAttribute('aria-pressed', on);
+  b.innerHTML = on ? `${ic('stop')}<span class="lbl">Parar</span>` : `${ic('volume')}<span class="lbl">Ouvir</span>`;
+  b.setAttribute('aria-label', on ? 'Parar a leitura em voz alta' : 'Ouvir esta página em voz alta');
+}
+function stopSpeak() { if (synth && (synth.speaking || synth.pending)) synth.cancel(); setSpeak(false); }
+$('#speakBtn').addEventListener('click', () => {
+  if (!synth) { toast('Este navegador não tem leitura em voz alta', 'alert'); return; }
+  if (synth.speaking || synth.pending) { stopSpeak(); return; }
+  const page = $('.page.active');
+  const txt = (`${$('#pageTitle').textContent}. ` + page.innerText).replace(/[ \t]+/g, ' ').replace(/\s*\n+\s*/g, '. ').replace(/(\.\s*){2,}/g, '. ');
+  const chunks = txt.match(/[^.!?]{1,220}[.!?]?/g) || [];
+  const voices = synth.getVoices();
+  const v = voices.find(x => /^pt[-_]BR/i.test(x.lang) && x.localService) || voices.find(x => /^pt/i.test(x.lang));
+  chunks.forEach((c, i) => { const u = new SpeechSynthesisUtterance(c.trim()); u.lang = 'pt-BR'; if (v) u.voice = v; u.rate = .95; if (i === chunks.length - 1) u.onend = () => setSpeak(false); synth.speak(u); });
+  setSpeak(true); toast('Lendo a página em voz alta. Toque em “Parar” para interromper.', 'volume');
+});
+const baseShowPage = showPage;
+showPage = function (id, o) { stopSpeak(); baseShowPage(id, o); };
+
+/* =====================================================================
+   18. MODO SIMPLES, EMERGÊNCIA, BOAS-VINDAS E EFEITO DE TOQUE
+   ===================================================================== */
+$('#simpleBtn').addEventListener('click', e => {
+  const on = root.dataset.simple !== 'on';
+  on ? root.dataset.simple = 'on' : delete root.dataset.simple;
+  e.currentTarget.setAttribute('aria-pressed', on);
+  if (on && si < 2) setScale(2);
+  toast(on ? 'Modo simples ativado: botões maiores e menos enfeites' : 'Modo simples desativado', 'simple');
+});
+
+$('#sosBtn').addEventListener('click', () => openModal({
+  eyebrow: 'Emergência', title: 'Em uma emergência, ligue para o SAMU',
+  body: `<p class="sos-number">192</p><p class="card-sub" style="text-align:center">SAMU · Serviço de Atendimento Móvel de Urgência · ligação gratuita, 24 horas</p>
+    <div class="sos-call"><a class="btn-primary sos-link" href="tel:192">${ic('phone')} Ligar para 192</a></div>
+    <ul class="tips"><li>${ic('info')}<span>Corpo de Bombeiros: <b>193</b>.</span></li><li>${ic('alert')}<span>O CUIDAR não é um canal de urgência e não envia pedidos de socorro. Se o botão não funcionar neste aparelho, disque 192 no telefone.</span></li></ul>`
+}));
+
+const tour = $('#tour'); let ts = 0;
+function tourGo(n) {
+  ts = n;
+  $$('.tour-step', tour).forEach(s => s.hidden = +s.dataset.s !== n);
+  $$('.tour-dots i', tour).forEach((d, i) => d.classList.toggle('on', i === n));
+  $('#tourBack').hidden = n === 0;
+  $('#tourNext').textContent = n === 2 ? 'Começar' : 'Continuar';
+}
+function openTour() { tourGo(0); tour.showModal(); }
+$('#tourNext').addEventListener('click', () => { if (ts < 2) tourGo(ts + 1); else { tour.close(); toast('Tudo pronto. Bom uso do CUIDAR!', 'heart'); } });
+$('#tourBack').addEventListener('click', () => tourGo(Math.max(0, ts - 1)));
+$('#tourSkip').addEventListener('click', () => tour.close());
+$('#tourBtn').addEventListener('click', () => { toolsPanel.classList.remove('open'); $('#a11yToggle').setAttribute('aria-expanded', 'false'); openTour(); });
+tour.addEventListener('click', e => {
+  const a = e.target.closest('[data-act]'); if (!a) return;
+  if (a.dataset.act === 'up') setScale(si + 1);
+  if (a.dataset.act === 'down') setScale(si - 1);
+  if (a.dataset.act === 'contrast') $('#contrastBtn').click();
+});
+
+document.addEventListener('pointerdown', e => {
+  const b = e.target.closest('.btn-primary,.btn-soft,.chip,.q-tile,.pill-btn,.face,.todo-item');
+  if (!b || reduced() || root.dataset.simple === 'on') return;
+  const r = b.getBoundingClientRect(), s = Math.max(r.width, r.height);
+  const sp = el('span', 'ripple'); sp.style.cssText = `width:${s}px;height:${s}px;left:${e.clientX - r.left - s / 2}px;top:${e.clientY - r.top - s / 2}px`;
+  b.append(sp); setTimeout(() => sp.remove(), 650);
+});
+
+/* =====================================================================
+   19. INICIALIZAÇÃO
+   ===================================================================== */
+setTheme(matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light', true);
+$('#fontDown').disabled = false;
+renderDocs();
+renderWeek();
+selectStep(1);
+showPage(location.hash.replace('#/', '') || 'inicio', {focus: false});
+setTimeout(openTour, reduced() ? 0 : 450);
+</script>
+</body>
+</html>

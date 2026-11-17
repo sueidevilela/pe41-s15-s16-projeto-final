@@ -1,0 +1,24 @@
+# CUIDAR v7 — o que vai para a Vercel
+#
+# Lista FECHADA: a Vercel ignora tudo e só publica o que está liberado abaixo.
+# É a mesma lista que o servidor local (app/servidor.js) deixa o navegador abrir.
+# Assim docs/, kits, dados/limpos/, dados/brutos/, scripts e arquivos do Claude
+# nunca vão para a internet.
+
+# 1. Ignora tudo
+/*
+
+# 2. Libera só o que o app precisa
+!/vercel.json
+!/cuidar_v6.html
+!/login.html
+!/js
+!/img
+
+!/app
+/app/*
+!/app/rag.js
+
+!/dados
+/dados/*
+!/dados/biblioteca.json

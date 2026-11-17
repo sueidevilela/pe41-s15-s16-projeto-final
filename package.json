@@ -1,0 +1,14 @@
+{
+  "name": "cuidar-biblioteca-tradutor",
+  "version": "1.0.0",
+  "private": true,
+  "description": "CUIDAR — biblioteca do Tradutor da Saúde (RAG) e servidor local do protótipo",
+  "scripts": {
+    "start": "node app/servidor.js",
+    "testar-busca": "node scripts/testar_busca.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^1.8.0",
+    "zod": "^4.6.7"
+  }
+}
