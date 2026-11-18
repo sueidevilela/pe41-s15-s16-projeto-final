@@ -1005,7 +1005,7 @@ dialog.tour{width:min(580px,calc(100vw - 24px))}
       <div class="eyebrow">Olá, Maria 👋</div>
       <h2>Seu cuidado merece estar conectado.</h2>
       <p>Reunimos suas informações, compromissos e orientações em um só lugar para facilitar sua jornada de saúde.</p>
-      <div class="date-chip"><svg class="i"><use href="#i-clock"/></svg> Sábado, 7 de novembro de 2026</div>
+      <div class="date-chip"><svg class="i"><use href="#i-clock"/></svg> <span id="hojeData">Hoje</span></div>
     </div>
     <!-- Ilustração original: fígado estilizado com linha de cuidado -->
     <div class="welcome-art" aria-hidden="true">
@@ -1039,9 +1039,9 @@ dialog.tour{width:min(580px,calc(100vw - 24px))}
   </div>
 
   <div class="stats">
-    <div class="card stat lift reveal"><div class="stat-icon"><svg class="i"><use href="#i-folder"/></svg></div><div><div class="stat-label">Documentos organizados</div><strong><span data-count="18" data-pad="2" aria-hidden="true">18</span><span class="sr-only">18</span></strong><small>Em seu histórico de saúde</small></div></div>
+    <div class="card stat lift reveal"><div class="stat-icon"><svg class="i"><use href="#i-folder"/></svg></div><div><div class="stat-label">Documentos organizados</div><strong><span id="statDocs" data-count="5" data-pad="2" aria-hidden="true">05</span><span class="sr-only">05</span></strong><small>Em seu histórico de saúde</small></div></div>
     <div class="card stat lift reveal"><div class="stat-icon"><svg class="i"><use href="#i-calendar"/></svg></div><div><div class="stat-label">Próximos compromissos</div><strong><span data-count="2" data-pad="2" aria-hidden="true">02</span><span class="sr-only">02</span></strong><small>Consultas e exames</small></div></div>
-    <div class="card stat lift reveal"><div class="stat-icon"><svg class="i"><use href="#i-users"/></svg></div><div><div class="stat-label">Equipe de cuidado</div><strong><span data-count="6" data-pad="2" aria-hidden="true">06</span><span class="sr-only">06</span></strong><small>Especialidades registradas</small></div></div>
+    <div class="card stat lift reveal"><div class="stat-icon"><svg class="i"><use href="#i-users"/></svg></div><div><div class="stat-label">Equipe de cuidado</div><strong><span id="statEquipe" data-count="8" data-pad="2" aria-hidden="true">08</span><span class="sr-only">08</span></strong><small>Especialidades registradas</small></div></div>
   </div>
 
   <!-- Diário de bem-estar e Pequenos passos de hoje (trazidos da v3) -->
@@ -1058,7 +1058,7 @@ dialog.tour{width:min(580px,calc(100vw - 24px))}
     </div>
 
     <div class="card today reveal">
-      <div class="ci-head"><div><div class="eyebrow">Hoje · sábado, 7 nov</div><h3>Pequenos passos de hoje</h3></div>
+      <div class="ci-head"><div><div class="eyebrow" id="hojeCurto">Hoje</div><h3>Pequenos passos de hoje</h3></div>
         <div class="ring" aria-hidden="true"><svg viewBox="0 0 58 58"><circle class="bg" cx="29" cy="29" r="24"/><circle class="fg" id="ringFg" cx="29" cy="29" r="24"/></svg><span id="ringTxt">0/4</span></div></div>
       <ul class="todo">
         <li><label class="todo-item"><input type="checkbox" id="td1"><span class="box"><svg class="i"><use href="#i-check"/></svg></span><span class="t">Separar os exames recentes para a consulta de 12/nov</span></label></li>
@@ -1594,6 +1594,25 @@ function renderDocs(newIdx = -1) {
   });
   if (!shown.length) list.innerHTML = '<li class="empty-state">Nenhum documento encontrado com esse filtro ou busca.</li>';
   $('#docCount').textContent = `${shown.length} de ${docs.length} documento(s) exibido(s).`;
+  definirContador('#statDocs', docs.length); // Visão geral mostra o mesmo total desta aba
+}
+
+// Muda um número da Visão geral (o visível e o lido pelo leitor de tela).
+function definirContador(sel, n) {
+  const s = $(sel); if (!s) return;
+  const txt = String(n).padStart(+(s.dataset.pad || 0), '0');
+  s.dataset.count = n; s.textContent = txt;
+  if (s.nextElementSibling) s.nextElementSibling.textContent = txt;
+}
+
+// Data de hoje na Visão geral (antes era fixa em "Sábado, 7 de novembro de 2026").
+function mostrarDataDeHoje() {
+  const hoje = new Date();
+  const longa = hoje.toLocaleDateString('pt-BR', {weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'});
+  $('#hojeData').textContent = longa.charAt(0).toUpperCase() + longa.slice(1);
+  const dia = hoje.toLocaleDateString('pt-BR', {weekday: 'long'}).replace('-feira', '');
+  const mes = hoje.toLocaleDateString('pt-BR', {month: 'short'}).replace('.', '');
+  $('#hojeCurto').textContent = `Hoje · ${dia}, ${hoje.getDate()} ${mes}`;
 }
 
 function showFileChips() {
@@ -1788,6 +1807,7 @@ team.forEach(([icon, name, sub, role], i) => {
   c.innerHTML = `<button class="team-btn" type="button" aria-expanded="false" aria-controls="tm${i}"><span class="s-ico">${ic(icon)}</span><span><b></b><small></small></span>${ic('chev', 'chev')}</button><div class="collapse" id="tm${i}" inert><div><div class="team-role"><span class="lbl">Papel na jornada</span><span class="r"></span></div></div></div>`;
   $('b', c).textContent = name; $('small', c).textContent = sub; $('.r', c).textContent = role;
   $('#teamGrid').append(c);
+  definirContador('#statEquipe', team.length); // Visão geral mostra quantas especialidades a aba Equipe tem
 });
 
 let statusTimer;
@@ -2050,7 +2070,8 @@ moods.forEach((m, i) => {
   const c = el('button', 'chip'); c.type = 'button'; c.setAttribute('aria-pressed', 'false'); c.innerHTML = ic('check', 'chk'); c.append(s);
   c.addEventListener('click', () => c.setAttribute('aria-pressed', c.getAttribute('aria-pressed') !== 'true')); $('#symChips').append(c);
 });
-const weekPast = [3, 3, 2, 3, 1, 2], weekDays = ['Dom','Seg','Ter','Qua','Qui','Sex','Hoje'];
+// Nomes dos 6 dias anteriores calculados a partir de hoje (antes eram fixos de Dom a Sex).
+const weekPast = [3, 3, 2, 3, 1, 2], weekDays = [6, 5, 4, 3, 2, 1].map(n => ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'][new Date(Date.now() - n * 864e5).getDay()]).concat('Hoje');
 function renderWeek() {
   const w = $('#week'); w.innerHTML = '';
   const vals = [...weekPast, mood < 0 ? null : 4 - mood];
@@ -2175,6 +2196,7 @@ document.addEventListener('pointerdown', e => {
 setTheme(matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light', true);
 $('#fontDown').disabled = false;
 setScale(tamanhoGuardado(), true); // volta o tamanho de texto escolhido na última visita
+mostrarDataDeHoje();
 renderDocs();
 carregarDocumentos(); // traz os documentos guardados no Supabase (o RLS filtra por paciente)
 renderWeek();
