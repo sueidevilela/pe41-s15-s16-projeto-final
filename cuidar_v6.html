@@ -477,6 +477,12 @@ dialog.modal::backdrop{background:rgba(12,32,52,.42);-webkit-backdrop-filter:blu
 .modal ul.tips{list-style:none;display:grid;gap:10px}
 .modal ul.tips li{display:flex;gap:10px;align-items:flex-start;font-size:.9rem;line-height:1.55;background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:11px 13px}
 .modal ul.tips .i{color:var(--teal-strong);margin-top:2px}
+dialog.modal.is-wide{width:min(920px,calc(100vw - 32px))}
+.doc-view img,.doc-view iframe{display:block;width:100%;border:1px solid var(--line);border-radius:16px;background:var(--surface-2)}
+.doc-view img{max-height:70vh;object-fit:contain}
+.doc-view iframe{height:70vh}
+.doc-view .actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+.doc-row .doc-del{color:var(--muted)}
 .preview-sheet{position:relative;overflow:hidden;border:1px solid var(--line);border-radius:16px;background:var(--surface-2);padding:20px;min-height:260px}
 .preview-sheet .ph{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid var(--sky-2);padding-bottom:10px;margin-bottom:14px;font-size:.72rem;font-weight:800;letter-spacing:.14em;color:var(--blue-strong)}
 .preview-sheet .ln{height:10px;border-radius:6px;background:var(--line);margin:10px 0}
@@ -1169,10 +1175,10 @@ dialog.tour{width:min(580px,calc(100vw - 24px))}
     <div class="field">
       <span class="label" id="fileLbl">Adicionar documento (protótipo)</span>
       <div class="dropzone" id="dropzone">
-        <input type="file" id="fileInput" multiple aria-labelledby="fileLbl" aria-describedby="dzHelp">
+        <input type="file" id="fileInput" multiple accept="application/pdf,image/png,image/jpeg,image/webp,.pdf,.png,.jpg,.jpeg,.webp" aria-labelledby="fileLbl" aria-describedby="dzHelp">
         <span class="dz-ico"><svg class="i"><use href="#i-upload"/></svg></span>
         <b>Arraste e solte arquivos aqui</b>
-        <small id="dzHelp">ou clique para escolher · PDF, imagens e outros formatos</small>
+        <small id="dzHelp">ou clique para escolher · PDF ou foto (JPG, PNG, WEBP) · até 10 MB</small>
       </div>
       <div class="file-chips" id="fileChips" aria-live="polite"></div>
     </div>
@@ -1183,7 +1189,7 @@ dialog.tour{width:min(580px,calc(100vw - 24px))}
     <div class="actions"><button class="btn-primary" type="submit"><svg class="i"><use href="#i-plus"/></svg> Registrar documento</button></div>
     <div id="uploadResult" class="result" hidden role="status"></div>
 
-    <div class="section-head"><h3>Arquivos registrados</h3><span class="tag blue">Exemplos</span></div>
+    <div class="section-head"><h3>Arquivos registrados</h3><span class="tag gold">Use só arquivos fictícios</span></div>
     <div class="doc-tools">
       <div class="chips" id="docFilters" role="group" aria-label="Filtrar por tipo"></div>
       <label class="search"><span class="sr-only">Buscar documentos</span><svg class="i"><use href="#i-search"/></svg><input type="search" id="docSearch" placeholder="Buscar por nome ou instituição" autocomplete="off"></label>
@@ -1191,7 +1197,7 @@ dialog.tour{width:min(580px,calc(100vw - 24px))}
     <ul class="doc-list" id="docList"></ul>
     <p class="card-sub" id="docCount" aria-live="polite"></p>
   </form>
-  <p class="notice reveal"><svg class="i"><use href="#i-shield"/></svg><span>Nesta demonstração, o arquivo não é enviado nem armazenado em servidor. A versão real exigiria armazenamento seguro, controle de acesso, consentimento e proteção de dados.</span></p>
+  <p class="notice reveal"><svg class="i"><use href="#i-shield"/></svg><span>Seus arquivos ficam guardados numa pasta privada. Só você pode abri-los. Este é um protótipo acadêmico: envie apenas documentos fictícios, nunca exames reais.</span></p>
 </section>
 
 <!-- =====================================================================
@@ -1571,14 +1577,20 @@ function renderDocs(newIdx = -1) {
   const shown = docs.map((d, i) => ({d, i})).filter(({d}) => (docFilter === 'Todos' || d.type === docFilter) && (!q || norm(`${d.name} ${d.origin} ${d.type}`).includes(q)));
   shown.forEach(({d, i}) => {
     const li = el('li', 'doc-row' + (i === newIdx ? ' is-new' : ''));
-    li.innerHTML = `<span class="doc-ext ${d.ext === 'IMG' ? 'img' : ''}" aria-hidden="true"></span><div class="doc-info"><b></b><small></small></div><span class="tag ${d.temp ? 'gold' : 'blue'}"></span>`;
+    li.innerHTML = `<span class="doc-ext ${d.ext === 'IMG' ? 'img' : ''}" aria-hidden="true"></span><div class="doc-info"><b></b><small></small></div><span class="tag ${d.real ? 'blue' : 'gold'}"></span>`;
     li.querySelector('.doc-ext').textContent = d.ext;
     li.querySelector('b').textContent = d.name;
     li.querySelector('small').textContent = `${d.origin} · ${d.date}`;
-    li.querySelector('.tag').textContent = d.temp ? 'Simulação' : d.type;
+    li.querySelector('.tag').textContent = d.real ? d.type : 'Exemplo fictício';
     const b = el('button', 'btn-link'); b.type = 'button'; b.innerHTML = ic('eye') + ' Abrir'; b.setAttribute('aria-label', `Abrir ${d.name}`);
-    b.addEventListener('click', () => openPreview(d, 'Arquivo demonstrativo'));
-    li.append(b); list.append(li);
+    b.addEventListener('click', () => d.real ? abrirDocumento(d) : openPreview(d, 'Arquivo demonstrativo'));
+    li.append(b);
+    if (d.real) {
+      const del = el('button', 'btn-link doc-del'); del.type = 'button'; del.innerHTML = ic('x') + ' Remover'; del.setAttribute('aria-label', `Remover ${d.name}`);
+      del.addEventListener('click', () => removerDocumento(d, del));
+      li.append(del);
+    }
+    list.append(li);
   });
   if (!shown.length) list.innerHTML = '<li class="empty-state">Nenhum documento encontrado com esse filtro ou busca.</li>';
   $('#docCount').textContent = `${shown.length} de ${docs.length} documento(s) exibido(s).`;
@@ -1593,18 +1605,146 @@ fileInput.addEventListener('change', showFileChips);
 ['dragleave','drop'].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.remove('drag'); }));
 dz.addEventListener('drop', e => { if (e.dataTransfer?.files?.length) { fileInput.files = e.dataTransfer.files; showFileChips(); toast(`${e.dataTransfer.files.length} arquivo(s) pronto(s) para registrar`, 'upload'); } });
 
-$('#docForm').addEventListener('submit', e => {
+/* ---------------------------------------------------------------------
+   Documentos guardados de verdade (Supabase do ambiente em uso):
+   - o arquivo vai para a pasta PRIVADA "documentos" (Storage), no caminho
+     <id da conta>/<código aleatório>.<extensão> — o nome original não vai no caminho;
+   - nome, tipo e instituição vão para a tabela public.documentos.
+   Quem pode ver, enviar e apagar é decidido pelo RLS: cada conta só os próprios documentos.
+   Os 5 documentos acima são exemplos fictícios fixos e continuam só na tela.
+   --------------------------------------------------------------------- */
+const sbDocs = window.cuidarSupabase;
+const DOC_FORMATOS = {'application/pdf': 'pdf', 'image/png': 'png', 'image/jpeg': 'jpg', 'image/webp': 'webp'};
+const DOC_MAX_BYTES = 10 * 1024 * 1024;
+const DOC_COLUNAS = 'id,nome,tipo,origem,caminho,formato,criado_em';
+let contaAtual = null; // id da conta logada: a pasta dos arquivos dela
+
+const dataCurta = iso => new Date(iso).toLocaleDateString('pt-BR', {day: '2-digit', month: 'short', year: 'numeric'}).replace(/\./g, '').replace(/ de /g, ' ');
+const docDoBanco = r => ({id: r.id, name: r.nome, type: r.tipo, origin: r.origem || 'Instituição não informada', date: dataCurta(r.criado_em),
+  ext: r.formato === 'application/pdf' ? 'PDF' : 'IMG', caminho: r.caminho, formato: r.formato, real: true});
+
+function mostrarResultadoDocs(icone, titulo, msg) {
+  const out = $('#uploadResult'); out.hidden = false; out.innerHTML = '';
+  const head = el('div', 'result-head'); const badge = el('span', 'badge'); badge.innerHTML = ic(icone);
+  head.append(badge, titulo); out.append(head, el('p', 'result-msg', msg));
+}
+
+async function carregarDocumentos() {
+  if (!sbDocs) return;
+  try {
+    const u = await sbDocs.auth.getUser();
+    if (u.error) throw u.error;
+    contaAtual = u.data?.user?.id || null;
+    const r = await sbDocs.from('documentos').select(DOC_COLUNAS).order('criado_em', {ascending: false});
+    if (r.error) throw r.error;
+    docs.splice(0, docs.length, ...r.data.map(docDoBanco), ...baseDocs);
+    renderDocs();
+  } catch (err) {
+    console.warn('Documentos: não foi possível carregar a lista.', err?.message);
+    mostrarResultadoDocs('info', 'Não foi possível carregar seus documentos', 'Verifique a internet e atualize a página.');
+  }
+}
+
+async function abrirDocumento(d) {
+  const wrap = el('div', 'doc-view');
+  const aviso = el('p', 'card-sub', 'Abrindo o documento…'); wrap.append(aviso);
+  modal.classList.add('is-wide');
+  openModal({eyebrow: `${d.type} · ${d.origin}`, title: d.name, body: wrap});
+  let url = null;
+  const limpar = () => { modal.classList.remove('is-wide'); if (url) URL.revokeObjectURL(url); };
+  modal.addEventListener('close', limpar, {once: true});
+  try {
+    // Baixa com o login da pessoa (o RLS confere) e mostra a partir da memória do navegador.
+    const {data, error} = await sbDocs.storage.from('documentos').download(d.caminho);
+    if (error) throw error;
+    if (!modal.open) return;
+    url = URL.createObjectURL(new Blob([data], {type: d.formato}));
+    aviso.remove();
+    if (d.formato === 'application/pdf') {
+      const fr = el('iframe'); fr.src = url; fr.title = `Documento: ${d.name}`; wrap.append(fr);
+    } else {
+      const img = el('img'); img.src = url; img.alt = `Imagem do documento ${d.name}`; wrap.append(img);
+    }
+    const acoes = el('div', 'actions');
+    const abrir = el('a', 'btn-primary'); abrir.href = url; abrir.target = '_blank'; abrir.rel = 'noopener'; abrir.innerHTML = ic('eye'); abrir.append(' Abrir em tela cheia');
+    const baixar = el('a', 'btn-link'); baixar.href = url; baixar.download = d.name; baixar.innerHTML = ic('upload'); baixar.append(' Baixar');
+    acoes.append(abrir, baixar); wrap.append(acoes);
+  } catch (err) {
+    console.warn('Documentos: não foi possível abrir.', err?.message);
+    aviso.textContent = 'Não foi possível abrir este documento agora. Verifique a internet e tente de novo.';
+  }
+}
+
+async function removerDocumento(d, botao) {
+  if (!confirm(`Remover o documento “${d.name}”? Ele será apagado e não poderá ser recuperado.`)) return;
+  botao.disabled = true;
+  try {
+    const r = await sbDocs.from('documentos').delete().eq('id', d.id).select('id');
+    if (r.error) throw r.error;
+    if (!r.data?.length) throw new Error('sem permissão para remover');
+    const s = await sbDocs.storage.from('documentos').remove([d.caminho]);
+    if (s.error) console.warn('Documentos: o arquivo ficou na pasta.', s.error.message);
+    const i = docs.indexOf(d); if (i >= 0) docs.splice(i, 1);
+    renderDocs();
+    toast('Documento removido', 'check');
+  } catch (err) {
+    console.warn('Documentos: não foi possível remover.', err?.message);
+    botao.disabled = false;
+    toast('Não foi possível remover o documento', 'info');
+  }
+}
+
+$('#docForm').addEventListener('submit', async e => {
   e.preventDefault();
-  const out = $('#uploadResult'); out.hidden = false;
+  const form = e.target, enviar = form.querySelector('button[type="submit"]');
   const files = [...fileInput.files];
-  if (!files.length) { out.innerHTML = `<div class="result-head"><span class="badge">${ic('info')}</span>Nenhum arquivo selecionado</div><p class="result-msg">Selecione um arquivo para simular o registro. Esta demonstração não armazena documentos.</p>`; return; }
-  const type = $('#docType').value || 'Outro', origin = $('#docOrigin').value.trim() || 'Instituição não informada';
-  files.forEach(f => { const ext = /\.(png|jpe?g|gif|webp|heic|bmp)$/i.test(f.name) ? 'IMG' : (f.name.split('.').pop() || 'DOC').slice(0, 4).toUpperCase(); docs.unshift({name: f.name, type, origin, date: 'Hoje · não armazenado', ext, temp: true}); });
-  out.innerHTML = `<div class="result-head"><span class="badge">${ic('check')}</span>Registro simulado</div><p class="result-msg">${files.length} arquivo(s) selecionado(s). No protótipo, nenhum arquivo será enviado ou armazenado.</p>`;
-  docFilter = 'Todos'; $$('[data-filter]').forEach(x => x.setAttribute('aria-pressed', x.dataset.filter === 'Todos')); $('#docSearch').value = '';
-  renderDocs(0);
-  e.target.reset(); $('#fileChips').innerHTML = '';
-  toast('Documento registrado na simulação', 'folder');
+  // Arquivo, instituição e tipo são obrigatórios (o banco também recusa sem eles).
+  // Sem asterisco na tela: a mensagem só aparece se a pessoa apertar com algo vazio.
+  const faltando = [];
+  if (!files.length) faltando.push({texto: 'o arquivo', campo: fileInput});
+  if (!$('#docOrigin').value.trim()) faltando.push({texto: 'a instituição de origem', campo: $('#docOrigin')});
+  if (!$('#docType').value) faltando.push({texto: 'o tipo de documento', campo: $('#docType')});
+  if (faltando.length) {
+    const nomes = faltando.map(f => f.texto);
+    const lista = nomes.length > 1 ? `${nomes.slice(0, -1).join(', ')} e ${nomes.at(-1)}` : nomes[0];
+    mostrarResultadoDocs('info', 'As informações não foram adicionadas', `Para guardar o documento, falta informar ${lista}.`);
+    faltando[0].campo.focus();
+    return;
+  }
+  if (!sbDocs || !contaAtual) { mostrarResultadoDocs('info', 'Não foi possível enviar', 'Verifique a internet e atualize a página.'); return; }
+  const recusados = files.filter(f => !DOC_FORMATOS[f.type] || !f.size || f.size > DOC_MAX_BYTES);
+  if (recusados.length) { mostrarResultadoDocs('info', 'Arquivo não aceito', `${recusados.map(f => f.name).join(', ')}: envie só PDF ou foto (JPG, PNG, WEBP) com até 10 MB.`); return; }
+
+  const tipo = $('#docType').value, origem = $('#docOrigin').value.trim().slice(0, 200);
+  enviar.disabled = true;
+  mostrarResultadoDocs('upload', 'Enviando…', `Enviando ${files.length} arquivo(s). Aguarde um instante.`);
+  const falhas = []; let enviados = 0;
+  for (const f of files) {
+    const caminho = `${contaAtual}/${crypto.randomUUID()}.${DOC_FORMATOS[f.type]}`;
+    try {
+      const up = await sbDocs.storage.from('documentos').upload(caminho, f, {contentType: f.type, upsert: false});
+      if (up.error) throw up.error;
+      const ins = await sbDocs.from('documentos')
+        .insert({nome: f.name.slice(0, 200), tipo, origem, caminho, formato: f.type, tamanho_bytes: f.size})
+        .select(DOC_COLUNAS).single();
+      if (ins.error) { await sbDocs.storage.from('documentos').remove([caminho]); throw ins.error; }
+      docs.unshift(docDoBanco(ins.data)); enviados++;
+    } catch (err) {
+      console.warn('Documentos: falha ao enviar um arquivo.', err?.message);
+      falhas.push(f.name);
+    }
+  }
+  enviar.disabled = false;
+
+  if (enviados) {
+    docFilter = 'Todos'; $$('[data-filter]').forEach(x => x.setAttribute('aria-pressed', x.dataset.filter === 'Todos')); $('#docSearch').value = '';
+    renderDocs(0);
+    form.reset(); $('#fileChips').innerHTML = '';
+    toast('Documento guardado', 'folder');
+  }
+  if (!falhas.length) mostrarResultadoDocs('check', 'Documento guardado', `${enviados} arquivo(s) guardado(s). Toque em “Abrir” para ver.`);
+  else mostrarResultadoDocs('info', enviados ? 'Alguns arquivos não foram enviados' : 'Não foi possível enviar',
+    `Não enviados: ${falhas.join(', ')}. Verifique a internet e tente de novo.`);
 });
 
 /* =====================================================================
@@ -2036,6 +2176,7 @@ setTheme(matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light', 
 $('#fontDown').disabled = false;
 setScale(tamanhoGuardado(), true); // volta o tamanho de texto escolhido na última visita
 renderDocs();
+carregarDocumentos(); // traz os documentos guardados no Supabase (o RLS filtra por paciente)
 renderWeek();
 selectStep(1);
 showPage(location.hash.replace('#/', '') || 'inicio', {focus: false});
