@@ -1061,7 +1061,7 @@ dialog.tour{width:min(580px,calc(100vw - 24px))}
       <div class="ci-head"><div><div class="eyebrow" id="hojeCurto">Hoje</div><h3>Pequenos passos de hoje</h3></div>
         <div class="ring" aria-hidden="true"><svg viewBox="0 0 58 58"><circle class="bg" cx="29" cy="29" r="24"/><circle class="fg" id="ringFg" cx="29" cy="29" r="24"/></svg><span id="ringTxt">0/4</span></div></div>
       <ul class="todo">
-        <li><label class="todo-item"><input type="checkbox" id="td1"><span class="box"><svg class="i"><use href="#i-check"/></svg></span><span class="t">Separar os exames recentes para a consulta de 12/nov</span></label></li>
+        <li><label class="todo-item"><input type="checkbox" id="td1"><span class="box"><svg class="i"><use href="#i-check"/></svg></span><span class="t">Separar os exames recentes para a consulta de <span data-prox="barra">12/nov</span></span></label></li>
         <li><label class="todo-item"><input type="checkbox" id="td2"><span class="box"><svg class="i"><use href="#i-check"/></svg></span><span class="t">Anotar as dúvidas para levar à hepatologia</span></label></li>
         <li><label class="todo-item"><input type="checkbox" id="td3"><span class="box"><svg class="i"><use href="#i-check"/></svg></span><span class="t">Combinar como chegar ao hospital no dia 12</span></label></li>
         <li><label class="todo-item"><input type="checkbox" id="td4"><span class="box"><svg class="i"><use href="#i-check"/></svg></span><span class="t">Reservar um momento de descanso ou de algo que faça bem</span></label></li>
@@ -1075,7 +1075,7 @@ dialog.tour{width:min(580px,calc(100vw - 24px))}
       <div class="section-head"><h3>Linha do tempo da saúde</h3><button class="btn-link" type="button" data-go="historico">Ver histórico completo <svg class="i"><use href="#i-arrow-r"/></svg></button></div>
       <ul class="card timeline">
         <li class="event" data-expand>
-          <button class="event-btn" type="button" aria-expanded="false" aria-controls="ev-o1"><span class="event-icon"><svg class="i"><use href="#i-stetho"/></svg></span><span><span class="event-title">Consulta com hepatologista</span><span class="event-desc">Retorno e acompanhamento clínico · Hospital de referência</span></span><time datetime="2026-11-12">12 nov</time><svg class="i chev"><use href="#i-chev"/></svg></button>
+          <button class="event-btn" type="button" aria-expanded="false" aria-controls="ev-o1"><span class="event-icon"><svg class="i"><use href="#i-stetho"/></svg></span><span><span class="event-title">Consulta com hepatologista</span><span class="event-desc">Retorno e acompanhamento clínico · Hospital de referência</span></span><time datetime="2026-11-12" data-prox="curta">12 nov</time><svg class="i chev"><use href="#i-chev"/></svg></button>
           <div class="collapse" id="ev-o1" inert><div><div class="event-detail"><div class="box">Compromisso agendado para as 09:30, no ambulatório. Leve seus documentos recentes e as dúvidas organizadas em “Depois da consulta”.<div class="meta"><span class="tag blue">Agendado</span><span class="tag ghost">Registro fictício</span></div></div></div></div></div>
         </li>
         <li class="event" data-expand>
@@ -1097,7 +1097,7 @@ dialog.tour{width:min(580px,calc(100vw - 24px))}
       <div class="card appt reveal">
         <div class="appt-muted">PRÓXIMO COMPROMISSO</div>
         <h3>Consulta · Hepatologia</h3>
-        <div class="appt-meta"><span><svg class="i"><use href="#i-calendar"/></svg> 12 de novembro</span><span><svg class="i"><use href="#i-clock"/></svg> 09:30</span></div>
+        <div class="appt-meta"><span><svg class="i"><use href="#i-calendar"/></svg> <span data-prox="longa">12 de novembro</span></span><span><svg class="i"><use href="#i-clock"/></svg> 09:30</span></div>
         <div class="place">Hospital de referência · Ambulatório</div>
         <button class="btn-light" type="button" id="apptBtn">Ver orientações <svg class="i"><use href="#i-arrow-r"/></svg></button>
       </div>
@@ -1429,6 +1429,15 @@ const norm = s => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 const announce = msg => { const l = $('#srLive'); l.textContent = ''; setTimeout(() => l.textContent = msg, 50); };
 function el(tag, cls, text) { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
 
+// Próxima consulta (fictícia): sempre 7 dias depois de hoje, para nunca ficar no passado.
+// Antes era fixa em 12 de novembro.
+const PROX_CONSULTA = (() => {
+  const d = new Date(Date.now() + 7 * 864e5);
+  const mesLongo = d.toLocaleDateString('pt-BR', {month: 'long'}), mesCurto = d.toLocaleDateString('pt-BR', {month: 'short'}).replace('.', '');
+  const iso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  return {iso, longa: `${d.getDate()} de ${mesLongo}`, curta: `${String(d.getDate()).padStart(2, '0')} ${mesCurto}`, barra: `${d.getDate()}/${mesCurto}`};
+})();
+
 /* =====================================================================
    1. NAVEGAÇÃO ENTRE TELAS (hash #/tela, transições e stagger)
    ===================================================================== */
@@ -1513,7 +1522,7 @@ function openPreview(d, label) {
 
 $('#apptBtn').addEventListener('click', () => openModal({
   eyebrow: 'Detalhes do compromisso demonstrativos', title: 'Consulta · Hepatologia',
-  body: `<div class="chips" style="margin-bottom:14px"><span class="tag blue">${ic('calendar')} 12 de novembro</span><span class="tag blue">${ic('clock')} 09:30</span><span class="tag">Hospital de referência · Ambulatório</span></div>
+  body: `<div class="chips" style="margin-bottom:14px"><span class="tag blue">${ic('calendar')} ${PROX_CONSULTA.longa}</span><span class="tag blue">${ic('clock')} 09:30</span><span class="tag">Hospital de referência · Ambulatório</span></div>
   <ul class="tips">
     <li>${ic('folder')}<span>Leve documento com foto, cartão do SUS e seus exames recentes (estão em “Documentos e exames”).</span></li>
     <li>${ic('question')}<span>Anote antes as dúvidas que quer levar. A tela “Depois da consulta” ajuda a organizar o que for conversado.</span></li>
@@ -1613,6 +1622,11 @@ function mostrarDataDeHoje() {
   const dia = hoje.toLocaleDateString('pt-BR', {weekday: 'long'}).replace('-feira', '');
   const mes = hoje.toLocaleDateString('pt-BR', {month: 'short'}).replace('.', '');
   $('#hojeCurto').textContent = `Hoje · ${dia}, ${hoje.getDate()} ${mes}`;
+  // Data da próxima consulta em todos os lugares que a mostram
+  $$('[data-prox]').forEach(n => {
+    n.textContent = PROX_CONSULTA[n.dataset.prox];
+    if (n.tagName === 'TIME') n.setAttribute('datetime', PROX_CONSULTA.iso);
+  });
 }
 
 function showFileChips() {
